@@ -1,0 +1,4 @@
+tool: fallback
+receptor: data/targets/mpro_6lu7_prepared.pdbqt
+max_candidates: 5
+exhaustiveness: 8

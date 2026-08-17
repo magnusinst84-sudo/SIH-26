@@ -1,0 +1,15 @@
+project_name: TargetForge
+application: mpro_screening
+disease: COVID-19
+target:
+  name: SARS-CoV-2 main protease
+  aliases: [Mpro, 3CLpro]
+  structure_id: 6LU7
+model:
+  type: demo_activity_model
+  version: demo_v1
+ranking:
+  activity_weight: 0.40
+  docking_weight: 0.30
+  property_weight: 0.20
+  novelty_weight: 0.10

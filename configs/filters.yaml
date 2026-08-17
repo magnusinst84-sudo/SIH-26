@@ -1,0 +1,5 @@
+max_molecular_weight: 500
+max_logp: 5.0
+max_hbd: 5
+max_hba: 10
+max_tpsa: 140
