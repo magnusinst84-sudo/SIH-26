@@ -31,7 +31,7 @@ from src.ui.state import init_session_state
 # ─── Page config (must be the very first Streamlit call) ─────────────────────
 st.set_page_config(
     page_title          = "TargetForge",
-    page_icon           = "🧬",
+    page_icon           = "src/ui/assets/favicon.png",
     layout              = "wide",
     initial_sidebar_state = "collapsed",
 )
