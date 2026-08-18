@@ -26,7 +26,8 @@ import streamlit as st
 from src.ui.state import init_session_state, WorkflowStep
 from src.ui.theme import inject_global_css, badge_html, demo_field_html, COLORS
 from src.ui.components import (
-    render_sidebar_progress,
+    render_top_navbar,
+    render_horizontal_stepper,
     render_scientific_disclaimer,
     render_demo_banner,
     render_step_gate,
@@ -45,11 +46,12 @@ from src.ui.export import build_ranking_csv
 
 inject_global_css()
 init_session_state(_ROOT)
-render_sidebar_progress()
+render_top_navbar()
+render_horizontal_stepper(WorkflowStep.RANKING)
 render_step_gate(WorkflowStep.RANKING)
 render_demo_banner()
 
-st.title("🏆 Final Ranking")
+st.title("Final Ranking")
 st.caption("Official computational ranking and what-if weight analysis.")
 
 # ─── Data ────────────────────────────────────────────────────────────────────
@@ -57,8 +59,8 @@ candidates = st.session_state.get("tf_candidates") or []
 weights    = st.session_state.get("tf_weights")    or {}
 
 if not candidates:
-    st.warning("No ranking data found. Run the demo pipeline from Home first.", icon="⚠️")
-    st.page_link("pages/01_home.py", label="← Go to Home", icon="🏠")
+    st.warning("No ranking data found. Run the demo pipeline from Home first.", icon=":material/warning:")
+    st.page_link("pages/01_home.py", label="← Go to Home", icon=":material/home:")
     render_scientific_disclaimer()
     st.stop()
 
@@ -67,7 +69,7 @@ if not candidates:
 # ══════════════════════════════════════════════════════════════════════════════
 st.markdown(
     '<div class="tf-card" style="border-left:4px solid #102A43">'
-    '<h2 style="margin-top:0;color:#102A43">📊 Official Computational Ranking</h2>'
+    '<h2 style="margin-top:0;color:#102A43">Official Computational Ranking</h2>'
     '<p style="color:#52606D;margin:0">Produced by the TargetForge pipeline using fixed weights '
     'from <code>configs/project.yaml</code>. These values are preserved exactly as computed.</p>'
     '</div>',
@@ -79,7 +81,7 @@ render_kpi_row(candidates)
 st.markdown("")
 
 # Ranking weights display (read-only)
-with st.expander("⚖️ Ranking Weights (read-only from project.yaml)", expanded=False):
+with st.expander("Ranking Weights (read-only from project.yaml)", expanded=False):
     for name, key in [
         ("Activity",  "activity_weight"),
         ("Docking",   "docking_weight"),
@@ -105,10 +107,10 @@ for c in candidates:
     rows.append({
         "Rank":             c.rank,
         "Compound ID":      c.candidate_id,
-        "Activity ⚠DEMO":  round(c.activity_score, 4),
-        "Docking ⚠DEMO":   round(c.docking.score_raw, 3) if c.docking.score_raw else None,
+        "Activity (DEMO)":  round(c.activity_score, 4),
+        "Docking (DEMO)":   round(c.docking.score_raw, 3) if c.docking.score_raw else None,
         "Property":         round(c.property_score, 2),
-        "Novelty ⚠DEMO":   round(c.novelty_score, 2),
+        "Novelty (DEMO)":   round(c.novelty_score, 2),
         "Final Score":      round(c.final_score, 4),
         "Predicted Class":  c.predicted_class,
         "Status":           c.status,
@@ -122,11 +124,11 @@ st.dataframe(
         "Final Score": st.column_config.ProgressColumn(
             "Final Score", min_value=0.0, max_value=1.0, format="%.4f"
         ),
-        "Activity ⚠DEMO": st.column_config.NumberColumn(format="%.4f"),
-        "Docking ⚠DEMO":  st.column_config.NumberColumn(format="%.3f"),
+        "Activity (DEMO)": st.column_config.NumberColumn(format="%.4f"),
+        "Docking (DEMO)":  st.column_config.NumberColumn(format="%.3f"),
     },
 )
-st.caption("⚠ Activity, Docking, and Novelty columns contain deterministic demo values.")
+st.caption("Activity, Docking, and Novelty columns contain deterministic demo values.")
 
 # Per-compound cards
 st.markdown("#### Compound Detail Cards")
@@ -139,7 +141,7 @@ render_fallback_notice()
 st.divider()
 csv_data = build_ranking_csv(candidates)
 st.download_button(
-    "⬇ Download Ranking CSV",
+    "Download Ranking CSV",
     data=csv_data,
     file_name="targetforge_ranking.csv",
     mime="text/csv",
@@ -149,7 +151,7 @@ st.download_button(
 # SECTION B — What-If Ranking Analysis
 # ══════════════════════════════════════════════════════════════════════════════
 st.divider()
-with st.expander("🔬 What-If Ranking Analysis (Frontend Simulation)", expanded=False):
+with st.expander("What-If Ranking Analysis (Frontend Simulation)", expanded=False):
     render_whatif_label()
 
     st.markdown("Adjust the scoring weights below to explore alternative ranking priorities.")
@@ -172,7 +174,7 @@ with st.expander("🔬 What-If Ranking Analysis (Frontend Simulation)", expanded
         st.warning(
             f"Weights sum to {total_w:.2f} (should be 1.00). "
             "What-if scores may not be directly comparable to official scores.",
-            icon="⚠️",
+            icon=":material/warning:",
         )
 
     whatif_weights = {
@@ -183,7 +185,7 @@ with st.expander("🔬 What-If Ranking Analysis (Frontend Simulation)", expanded
     }
     st.session_state["tf_whatif_weights"] = whatif_weights
 
-    if st.button("↺ Reset to Official Weights", key="reset_whatif"):
+    if st.button("Reset to Official Weights", key="reset_whatif"):
         for k in ["wi_a", "wi_d", "wi_p", "wi_n"]:
             if k in st.session_state:
                 del st.session_state[k]
@@ -221,7 +223,7 @@ with st.expander("🔬 What-If Ranking Analysis (Frontend Simulation)", expanded
         },
     )
     st.caption(
-        "⚠ What-If Rank and What-If Score are frontend-simulated values. "
+        "What-If Rank and What-If Score are frontend-simulated values. "
         "Official Rank and Official Score reflect the unchanged backend pipeline output."
     )
 

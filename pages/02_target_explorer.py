@@ -19,7 +19,8 @@ import streamlit as st
 from src.ui.state import init_session_state, WorkflowStep
 from src.ui.theme import inject_global_css
 from src.ui.components import (
-    render_sidebar_progress,
+    render_top_navbar,
+    render_horizontal_stepper,
     render_scientific_disclaimer,
     render_demo_banner,
     render_step_gate,
@@ -28,10 +29,11 @@ from src.ui.charts import weights_pie
 
 inject_global_css()
 init_session_state(_ROOT)
-render_sidebar_progress()
+render_top_navbar()
+render_horizontal_stepper(WorkflowStep.TARGET)
 render_demo_banner()
 
-st.title("🎯 Target Explorer")
+st.title("Target Explorer")
 st.caption("Review the biological target and screening configuration.")
 
 # ─── Target Info ─────────────────────────────────────────────────────────────
@@ -44,7 +46,7 @@ col_target, col_weights = st.columns([1.2, 1], gap="large")
 with col_target:
     st.markdown(
         '<div class="tf-card">'
-        '<h3 style="margin-top:0">🦠 Target Profile</h3>',
+        '<h3 style="margin-top:0">Target Profile</h3>',
         unsafe_allow_html=True,
     )
     info = {
@@ -69,7 +71,7 @@ with col_target:
     # Model Info
     st.markdown(
         '<div class="tf-card-sm">'
-        f'<strong>🤖 Activity Model</strong><br>'
+        f'<strong>Activity Model</strong><br>'
         f'<span style="color:#52606D;font-size:0.88rem">'
         f'Type: {target.get("model_type","demo_activity_model")}<br>'
         f'Version: {target.get("model_version","demo_v1")}</span>'
@@ -78,7 +80,7 @@ with col_target:
     )
 
 with col_weights:
-    st.markdown('<div class="tf-card"><h3 style="margin-top:0">⚖️ Ranking Weights</h3>', unsafe_allow_html=True)
+    st.markdown('<div class="tf-card"><h3 style="margin-top:0">Ranking Weights</h3>', unsafe_allow_html=True)
     st.caption("These weights combine four score components into the final candidate score. "
                "They are read from `configs/project.yaml` and not editable here.")
     st.plotly_chart(weights_pie(weights), use_container_width=True)
@@ -95,7 +97,7 @@ with col_weights:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ─── Filter Thresholds ───────────────────────────────────────────────────────
-st.markdown("### 🧫 Lipinski / Property Filter Thresholds")
+st.markdown("### Lipinski / Property Filter Thresholds")
 st.caption(
     "These are the backend defaults from `configs/filters.yaml`. "
     "You can adjust them interactively on the **Candidate Design** page."
@@ -115,7 +117,7 @@ for i, (label, val) in enumerate(thresholds):
         st.metric(label, val)
 
 # ─── Raw config inspector ────────────────────────────────────────────────────
-with st.expander("🔧 Raw project.yaml values", expanded=False):
+with st.expander("Raw project.yaml values", expanded=False):
     st.json({
         "project_name": target.get("project_name"),
         "disease":      target.get("disease"),
@@ -131,13 +133,13 @@ with st.expander("🔧 Raw project.yaml values", expanded=False):
         "ranking":      weights,
     })
 
-with st.expander("🔧 Raw filters.yaml values", expanded=False):
+with st.expander("Raw filters.yaml values", expanded=False):
     st.json(filters)
 
 # ─── Proceed CTA ─────────────────────────────────────────────────────────────
 st.divider()
-if st.button("✅ Confirm Target & Proceed to Dataset Manager", type="primary"):
-    st.page_link("pages/03_dataset_manager.py", label="Go to Dataset Manager →", icon="📂")
+if st.button("Confirm Target & Proceed to Dataset Manager", type="primary"):
+    st.page_link("pages/03_dataset_manager.py", label="Go to Dataset Manager →", icon=":material/database:")
     st.success("Target confirmed. Proceed to the Dataset Manager.")
 
 render_scientific_disclaimer()

@@ -33,7 +33,7 @@ st.set_page_config(
     page_title          = "TargetForge",
     page_icon           = "🧬",
     layout              = "wide",
-    initial_sidebar_state = "expanded",
+    initial_sidebar_state = "collapsed",
 )
 
 # ─── Global CSS + session state (idempotent) ──────────────────────────────────
@@ -42,14 +42,14 @@ init_session_state(ROOT)
 
 # ─── Page definitions ─────────────────────────────────────────────────────────
 pages = [
-    st.Page("pages/01_home.py",             title="Home",             icon="🏠", default=True),
-    st.Page("pages/02_target_explorer.py",  title="Target Explorer",  icon="🎯"),
-    st.Page("pages/03_dataset_manager.py",  title="Dataset Manager",  icon="📂"),
-    st.Page("pages/04_ai_screening.py",     title="AI Screening",     icon="🤖"),
-    st.Page("pages/05_candidate_design.py", title="Candidate Design", icon="🧪"),
-    st.Page("pages/06_docking_analysis.py", title="Docking Analysis", icon="⚛️"),
-    st.Page("pages/07_final_ranking.py",    title="Final Ranking",    icon="🏆"),
-    st.Page("pages/08_reports.py",          title="Reports",          icon="📄"),
+    st.Page("pages/01_home.py",             title="Home",             icon=":material/home:", default=True),
+    st.Page("pages/02_target_explorer.py",  title="Target Explorer",  icon=":material/track_changes:"),
+    st.Page("pages/03_dataset_manager.py",  title="Dataset Manager",  icon=":material/database:"),
+    st.Page("pages/04_ai_screening.py",     title="AI Screening",     icon=":material/hub:"),
+    st.Page("pages/05_candidate_design.py", title="Candidate Design", icon=":material/science:"),
+    st.Page("pages/06_docking_analysis.py", title="Docking Analysis", icon=":material/join_inner:"),
+    st.Page("pages/07_final_ranking.py",    title="Final Ranking",    icon=":material/leaderboard:"),
+    st.Page("pages/08_reports.py",          title="Reports",          icon=":material/description:"),
 ]
 
 # ─── Navigation dispatch ──────────────────────────────────────────────────────

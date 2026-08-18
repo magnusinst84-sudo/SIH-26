@@ -22,7 +22,8 @@ import streamlit as st
 from src.ui.state import init_session_state, WorkflowStep
 from src.ui.theme import inject_global_css, badge_html, COLORS
 from src.ui.components import (
-    render_sidebar_progress,
+    render_top_navbar,
+    render_horizontal_stepper,
     render_scientific_disclaimer,
     render_demo_banner,
     render_step_gate,
@@ -33,11 +34,12 @@ from src.ui.adapter import reapply_filters, adapt_ranked_df
 
 inject_global_css()
 init_session_state(_ROOT)
-render_sidebar_progress()
+render_top_navbar()
+render_horizontal_stepper(WorkflowStep.DESIGN)
 render_step_gate(WorkflowStep.DESIGN)
 render_demo_banner()
 
-st.title("🧪 Candidate Design")
+st.title("Candidate Design")
 st.caption("Apply interactive property filters to narrow your candidate set.")
 
 # ─── Data ────────────────────────────────────────────────────────────────────
@@ -46,8 +48,8 @@ backend_config = st.session_state.get("tf_filter_config", {})
 ui_config      = st.session_state.get("tf_ui_filter_config") or dict(backend_config)
 
 if validated_df is None or validated_df.empty:
-    st.warning("No validated compounds found. Complete the Dataset Manager step.", icon="⚠️")
-    st.page_link("pages/03_dataset_manager.py", label="← Go to Dataset Manager", icon="📂")
+    st.warning("No validated compounds found. Complete the Dataset Manager step.", icon=":material/warning:")
+    st.page_link("pages/03_dataset_manager.py", label="← Go to Dataset Manager", icon=":material/database:")
     render_scientific_disclaimer()
     st.stop()
 
@@ -62,9 +64,9 @@ if not required_descs.issubset(set(validated_df.columns)):
         st.info(
             "Molecular descriptors are not yet computed. "
             "Run the full demo pipeline from the Home page to populate descriptor columns.",
-            icon="ℹ️",
+            icon=":material/info:",
         )
-        st.page_link("pages/01_home.py", label="← Go to Home", icon="🏠")
+        st.page_link("pages/01_home.py", label="← Go to Home", icon=":material/home:")
         render_scientific_disclaimer()
         st.stop()
 
@@ -72,7 +74,7 @@ if not required_descs.issubset(set(validated_df.columns)):
 col_sliders, col_results = st.columns([1, 2.5], gap="large")
 
 with col_sliders:
-    st.markdown("### ⚙️ Filter Thresholds")
+    st.markdown("### Filter Thresholds")
     st.caption("Drag sliders to filter compounds in real time.")
 
     mw_val  = st.slider("Molecular Weight (Da)", 0, 1000,
@@ -89,9 +91,9 @@ with col_sliders:
                          int(ui_config.get("max_tpsa", 140)), step=5, key="sl_tps")
     rb_val  = st.slider("Rotatable Bonds", 0, 20,
                          int(ui_config.get("max_rotatable_bonds", 10)), key="sl_rb")
-    st.caption("⚠ Rotatable Bonds threshold is a UI-only parameter — not in `filters.yaml`.")
+    st.caption("Rotatable Bonds threshold is a UI-only parameter — not in `filters.yaml`.")
 
-    if st.button("↺ Reset to Backend Defaults", key="reset_filters"):
+    if st.button("Reset to Backend Defaults", key="reset_filters"):
         for key in ["sl_mw", "sl_lp", "sl_hbd", "sl_hba", "sl_tps", "sl_rb"]:
             if key in st.session_state:
                 del st.session_state[key]
@@ -151,8 +153,8 @@ with col_results:
 
     disp = filtered_df[table_cols].copy()
     if "filter_status" in disp.columns:
-        disp.insert(0, "✓/✗", disp["filter_status"].map(
-            {"PASS": "✅ PASS", "REJECTED": "❌ REJECTED"}
+        disp.insert(0, "Status", disp["filter_status"].map(
+            {"PASS": "PASS", "REJECTED": "REJECTED"}
         ))
     st.dataframe(
         disp.round(3),
@@ -168,7 +170,7 @@ with col_results:
     # Rejected breakdown
     rejected_rows = filtered_df[filtered_df["filter_status"] == "REJECTED"]
     if not rejected_rows.empty:
-        with st.expander(f"❌ Rejected compounds ({len(rejected_rows)})", expanded=False):
+        with st.expander(f"Rejected compounds ({len(rejected_rows)})", expanded=False):
             for _, row in rejected_rows.iterrows():
                 reasons = row.get("filter_reasons", "")
                 st.markdown(
@@ -177,7 +179,7 @@ with col_results:
 
 # ─── Property radar for each candidate ───────────────────────────────────────
 st.divider()
-st.markdown("### 🕸 Molecular Property Profiles")
+st.markdown("### Molecular Property Profiles")
 candidates = st.session_state.get("tf_candidates")
 if candidates:
     radar_cols = st.columns(min(3, len(candidates)))
@@ -191,13 +193,13 @@ else:
 # ─── Proceed CTA ─────────────────────────────────────────────────────────────
 st.divider()
 if n_pass == 0:
-    st.warning("No compounds pass the current filters. Adjust thresholds to proceed.", icon="⚠️")
+    st.warning("No compounds pass the current filters. Adjust thresholds to proceed.", icon=":material/warning:")
 else:
-    st.success(f"✅ {n_pass} compound(s) pass filters and are eligible for docking.")
+    st.success(f"{n_pass} compound(s) pass filters and are eligible for docking.")
     st.page_link(
         "pages/06_docking_analysis.py",
         label="Proceed to Docking Analysis →",
-        icon="⚛️",
+        icon=":material/join_inner:",
     )
 
 render_scientific_disclaimer()

@@ -21,7 +21,8 @@ import streamlit as st
 from src.ui.state import init_session_state, WorkflowStep
 from src.ui.theme import inject_global_css
 from src.ui.components import (
-    render_sidebar_progress,
+    render_top_navbar,
+    render_horizontal_stepper,
     render_scientific_disclaimer,
     render_demo_banner,
     render_step_gate,
@@ -30,14 +31,15 @@ from src.ui.charts import validation_bar, filter_funnel
 
 inject_global_css()
 init_session_state(_ROOT)
-render_sidebar_progress()
+render_top_navbar()
+render_horizontal_stepper(WorkflowStep.DATASET)
 render_step_gate(WorkflowStep.DATASET)
 render_demo_banner()
 
-st.title("📂 Dataset Manager")
+st.title("Dataset Manager")
 st.caption("Load a compound library for screening.")
 
-tab_demo, tab_upload = st.tabs(["🧪 Demo Dataset", "📤 Upload Custom CSV"])
+tab_demo, tab_upload = st.tabs(["Demo Dataset", "Upload Custom CSV"])
 
 # ─── Tab A: Demo Dataset ─────────────────────────────────────────────────────
 with tab_demo:
@@ -49,7 +51,7 @@ with tab_demo:
     else:
         st.warning(
             "Demo compounds file not found. Run `python scripts/prepare_demo.py` first.",
-            icon="⚠️",
+            icon=":material/warning:",
         )
         demo_df = None
 
@@ -76,7 +78,7 @@ with tab_demo:
                     st.session_state["tf_ui_filter_config"] = dict(
                         st.session_state["tf_filter_config"]
                     )
-            st.success(f"✅ Loaded {len(valid_df)} valid compounds, {len(rejected_df)} rejected.")
+            st.success(f"Loaded {len(valid_df)} valid compounds, {len(rejected_df)} rejected.")
             st.rerun()
 
 # ─── Tab B: Upload Custom CSV ────────────────────────────────────────────────
@@ -84,7 +86,7 @@ with tab_upload:
     st.info(
         "Upload a CSV with at minimum these columns: **`compound_id`**, **`smiles`**. "
         "An optional `activity_label` column is also accepted.",
-        icon="ℹ️",
+        icon=":material/info:",
     )
     uploaded = st.file_uploader("Choose a CSV file", type=["csv"], key="compound_upload")
     if uploaded is not None:
@@ -94,7 +96,7 @@ with tab_upload:
             required = {"compound_id", "smiles"}
             missing  = required - set(raw_df.columns)
             if missing:
-                st.error(f"Missing required columns: {sorted(missing)}", icon="❌")
+                st.error(f"Missing required columns: {sorted(missing)}", icon=":material/error_outline:")
             else:
                 st.markdown(f"**{len(raw_df)} compounds loaded from upload.**")
                 st.dataframe(raw_df.head(10), use_container_width=True, hide_index=True)
@@ -112,11 +114,11 @@ with tab_upload:
                                 st.session_state["tf_filter_config"]
                             )
                     st.success(
-                        f"✅ Validated: {len(valid_df)} valid / {len(rejected_df)} rejected."
+                        f"Validated: {len(valid_df)} valid / {len(rejected_df)} rejected."
                     )
                     st.rerun()
         except Exception as exc:
-            st.error(f"Could not read file: {exc}", icon="❌")
+            st.error(f"Could not read file: {exc}", icon=":material/error_outline:")
 
 # ─── Validation Results ──────────────────────────────────────────────────────
 validated_df = st.session_state.get("tf_validated_df")
@@ -132,8 +134,8 @@ if validated_df is not None:
 
     m1, m2, m3 = st.columns(3)
     m1.metric("Total Loaded",  n_total)
-    m2.metric("✓ Valid",        n_valid)
-    m3.metric("✗ Rejected",     n_rejected)
+    m2.metric("Valid",        n_valid)
+    m3.metric("Rejected",     n_rejected)
 
     col_chart, col_funnel = st.columns(2)
     with col_chart:
@@ -147,7 +149,7 @@ if validated_df is not None:
         )
 
     # Valid compounds table
-    st.markdown("#### ✓ Valid Compounds")
+    st.markdown("#### Valid Compounds")
     display_cols = [c for c in [
         "compound_id", "smiles", "canonical_smiles",
         "molecular_weight", "logp", "hbd", "hba", "tpsa"
@@ -160,7 +162,7 @@ if validated_df is not None:
 
     # Rejected compounds
     if rejected_df is not None and not rejected_df.empty:
-        with st.expander(f"✗ Rejected Compounds ({n_rejected})", expanded=False):
+        with st.expander(f"Rejected Compounds ({n_rejected})", expanded=False):
             st.dataframe(rejected_df, use_container_width=True, hide_index=True)
 
     # Proceed CTA
@@ -168,7 +170,7 @@ if validated_df is not None:
     st.page_link(
         "pages/04_ai_screening.py",
         label="Proceed to AI Screening →",
-        icon="🤖",
+        icon=":material/hub:",
     )
 
 render_scientific_disclaimer()

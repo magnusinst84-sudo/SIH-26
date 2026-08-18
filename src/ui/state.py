@@ -70,13 +70,13 @@ COMPLETION_KEYS: dict[WorkflowStep, str] = {
 }
 
 STEP_LABELS: dict[WorkflowStep, tuple[str, str]] = {
-    WorkflowStep.TARGET:    ("🎯", "Target Explorer"),
-    WorkflowStep.DATASET:   ("📂", "Dataset Manager"),
-    WorkflowStep.SCREENING: ("🤖", "AI Screening"),
-    WorkflowStep.DESIGN:    ("🧪", "Candidate Design"),
-    WorkflowStep.DOCKING:   ("⚛️", "Docking Analysis"),
-    WorkflowStep.RANKING:   ("🏆", "Final Ranking"),
-    WorkflowStep.REPORTS:   ("📄", "Reports"),
+    WorkflowStep.TARGET:    ("", "Target Explorer"),
+    WorkflowStep.DATASET:   ("", "Dataset Manager"),
+    WorkflowStep.SCREENING: ("", "AI Screening"),
+    WorkflowStep.DESIGN:    ("", "Candidate Design"),
+    WorkflowStep.DOCKING:   ("", "Docking Analysis"),
+    WorkflowStep.RANKING:   ("", "Final Ranking"),
+    WorkflowStep.REPORTS:   ("", "Reports"),
 }
 
 PAGE_PATHS: dict[WorkflowStep, str] = {

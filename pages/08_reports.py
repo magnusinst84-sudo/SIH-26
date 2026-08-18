@@ -19,7 +19,8 @@ import streamlit as st
 from src.ui.state import init_session_state, WorkflowStep
 from src.ui.theme import inject_global_css
 from src.ui.components import (
-    render_sidebar_progress,
+    render_top_navbar,
+    render_horizontal_stepper,
     render_scientific_disclaimer,
     render_demo_banner,
     render_step_gate,
@@ -33,11 +34,12 @@ from src.ui.export import (
 
 inject_global_css()
 init_session_state(_ROOT)
-render_sidebar_progress()
+render_top_navbar()
+render_horizontal_stepper(WorkflowStep.REPORTS)
 render_step_gate(WorkflowStep.REPORTS)
 render_demo_banner()
 
-st.title("📄 Reports")
+st.title("Reports")
 st.caption("Configure and download screening results in multiple formats.")
 
 # ─── Report section toggles ──────────────────────────────────────────────────
@@ -46,13 +48,13 @@ st.caption("Select sections to include. **Scientific Limitations** is always inc
 
 col_a, col_b = st.columns(2)
 with col_a:
-    inc_target   = st.checkbox("🎯 Target Summary",     value=True)
-    inc_dataset  = st.checkbox("📂 Dataset Statistics", value=True)
-    inc_screen   = st.checkbox("🤖 AI Screening Summary", value=True)
+    inc_target   = st.checkbox("Target Summary",     value=True)
+    inc_dataset  = st.checkbox("Dataset Statistics", value=True)
+    inc_screen   = st.checkbox("AI Screening Summary", value=True)
 with col_b:
-    inc_filter   = st.checkbox("🧪 Filter Results",     value=True)
-    inc_docking  = st.checkbox("⚛️ Docking Results",    value=True)
-    inc_ranking  = st.checkbox("🏆 Final Ranking Table", value=True)
+    inc_filter   = st.checkbox("Filter Results",     value=True)
+    inc_docking  = st.checkbox("Docking Results",    value=True)
+    inc_ranking  = st.checkbox("Final Ranking Table", value=True)
 
 sections = []
 if inc_target:  sections.append("target")
@@ -69,7 +71,7 @@ state_snapshot = dict(st.session_state)
 # ─── Report preview ──────────────────────────────────────────────────────────
 st.divider()
 st.markdown("### Preview")
-with st.expander("📋 Report Preview (Markdown)", expanded=True):
+with st.expander("Report Preview (Markdown)", expanded=True):
     report_md = build_markdown_report(state_snapshot, sections)
     st.markdown(report_md)
 
@@ -84,7 +86,7 @@ dl1, dl2, dl3, dl4 = st.columns(4)
 with dl1:
     csv_data = build_ranking_csv(candidates)
     st.download_button(
-        "⬇ Ranking CSV",
+        "Ranking CSV",
         data    = csv_data,
         file_name = "targetforge_ranking.csv",
         mime    = "text/csv",
@@ -94,7 +96,7 @@ with dl1:
 with dl2:
     val_csv = build_validated_csv(validated_df)
     st.download_button(
-        "⬇ Validated CSV",
+        "Validated CSV",
         data    = val_csv,
         file_name = "targetforge_validated.csv",
         mime    = "text/csv",
@@ -103,7 +105,7 @@ with dl2:
 
 with dl3:
     st.download_button(
-        "⬇ Full Report (Markdown)",
+        "Full Report (Markdown)",
         data    = report_md,
         file_name = "targetforge_report.md",
         mime    = "text/markdown",
@@ -113,7 +115,7 @@ with dl3:
 with dl4:
     json_data = build_summary_json(state_snapshot)
     st.download_button(
-        "⬇ Summary JSON",
+        "Summary JSON",
         data    = json_data,
         file_name = "targetforge_summary.json",
         mime    = "application/json",
@@ -133,7 +135,7 @@ checks = [
     ("Demo mode",               state_snapshot.get("tf_demo_mode", True)),
 ]
 for label, ok in checks:
-    icon = "✅" if ok else "⬜"
-    st.markdown(f"{icon} {label}")
+    dot = '<span style="color:#00B4D8; margin-right: 8px;">●</span>' if ok else '<span style="color:#1A365D; margin-right: 8px;">○</span>'
+    st.markdown(f'<div style="font-size:0.9rem; padding: 2px 0; display: flex; align-items: center;">{dot} {label}</div>', unsafe_allow_html=True)
 
 render_scientific_disclaimer()

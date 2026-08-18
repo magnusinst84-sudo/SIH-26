@@ -20,7 +20,8 @@ import streamlit as st
 from src.ui.state import init_session_state, WorkflowStep
 from src.ui.theme import inject_global_css, badge_html, COLORS
 from src.ui.components import (
-    render_sidebar_progress,
+    render_top_navbar,
+    render_horizontal_stepper,
     render_scientific_disclaimer,
     render_demo_banner,
     render_step_gate,
@@ -30,10 +31,11 @@ from src.ui.charts import score_distribution_histogram, activity_docking_scatter
 
 inject_global_css()
 init_session_state(_ROOT)
-render_sidebar_progress()
+render_top_navbar()
+render_horizontal_stepper(WorkflowStep.SCREENING)
 render_step_gate(WorkflowStep.SCREENING)
 
-st.title("🤖 AI Screening")
+st.title("AI Screening")
 st.caption("Activity prediction results for validated compounds.")
 
 render_demo_banner()
@@ -44,10 +46,10 @@ model_meta = st.session_state.get("tf_model_meta", {})
 
 st.markdown(
     f'<div class="tf-card-sm">'
-    f'<strong>🤖 Model: </strong>{target.get("model_version","demo_v1")} '
+    f'<strong>Model: </strong>{target.get("model_version","demo_v1")} '
     f'({target.get("model_type","demo_activity_model")})'
     f'&nbsp;&nbsp;'
-    f'<span class="tf-badge tf-badge-demo">⚠ DEMO PREDICTIONS</span>'
+    f'<span class="tf-badge tf-badge-demo">DEMO PREDICTIONS</span>'
     f'</div>',
     unsafe_allow_html=True,
 )
@@ -55,7 +57,7 @@ st.info(
     "Activity scores are **deterministic demo values** derived from the SHA-256 hash "
     "of each compound ID. They are not the output of a trained machine-learning model. "
     "Replace `src/ml/predict.py` with real model predictions during implementation.",
-    icon="⚠️",
+    icon=":material/warning:",
 )
 
 # ─── Activity prediction data ────────────────────────────────────────────────
@@ -76,9 +78,9 @@ if pred_df is None:
     st.warning(
         "No activity prediction data found. "
         "Run the demo pipeline from the Home page first.",
-        icon="⚠️",
+        icon=":material/warning:",
     )
-    st.page_link("pages/01_home.py", label="← Go to Home", icon="🏠")
+    st.page_link("pages/01_home.py", label="← Go to Home", icon=":material/home:")
     render_scientific_disclaimer()
     st.stop()
 
@@ -108,8 +110,8 @@ if display_cols:
 
     def _class_badge(cls: str) -> str:
         if cls == "active":
-            return "✅ active"
-        return "⬜ lower_priority"
+            return "active"
+        return "lower priority"
 
     if "predicted_class" in disp.columns:
         disp["predicted_class"] = disp["predicted_class"].apply(_class_badge)
@@ -122,14 +124,14 @@ if display_cols:
         hide_index=True,
         column_config={
             "activity_score": st.column_config.ProgressColumn(
-                "Activity Score ⚠DEMO",
+                "Activity Score (DEMO)",
                 min_value=0.0,
                 max_value=1.0,
                 format="%.4f",
             ),
         },
     )
-    st.caption("⚠ activity_score and model_version are deterministic demo values.")
+    st.caption("activity_score and model_version are deterministic demo values.")
 
 # ─── Charts ──────────────────────────────────────────────────────────────────
 col_hist, col_scatter = st.columns(2)
@@ -166,7 +168,7 @@ st.divider()
 st.page_link(
     "pages/05_candidate_design.py",
     label="Proceed to Candidate Design →",
-    icon="🧪",
+    icon=":material/science:",
 )
 
 render_scientific_disclaimer()
