@@ -9,3 +9,6 @@ models/*.pkl
 results/*.csv
 results/*.json
 !results/.gitkeep
+
+# Data files
+data/raw/*.csv
