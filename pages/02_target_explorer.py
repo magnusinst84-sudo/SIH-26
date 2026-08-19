@@ -193,7 +193,7 @@ with col_right:
       display: flex;
       gap: 5px;
       z-index: 100;
-      background: rgba(17, 22, 29, 0.88);
+      background: rgba(17, 22, 29, 0.90);
       backdrop-filter: blur(8px);
       border: 1px solid #232D38;
       padding: 4px 8px;
@@ -236,8 +236,9 @@ with col_right:
     <div id="gldiv" style="width: 100%; height: 100%;"></div>
     <div class="controls-overlay">
       <button class="btn-ctrl" onclick="toggleSpin()">Spin</button>
-      <button class="btn-ctrl" onclick="setStyle('cartoon')">Ribbon</button>
-      <button class="btn-ctrl" onclick="setStyle('surface')">Surface</button>
+      <button class="btn-ctrl" onclick="setRibbonStyle()">Ribbon</button>
+      <button class="btn-ctrl" onclick="setSecondaryStructure()">Secondary Structure</button>
+      <button class="btn-ctrl" onclick="setSurfaceStyle()">Surface</button>
       <button class="btn-ctrl" onclick="highlightBindingSite()">Catalytic Site</button>
       <button class="btn-ctrl" onclick="resetView()">Reset</button>
       <div class="legend-tag">
@@ -250,21 +251,27 @@ with col_right:
   <script>
     let viewer = null;
     let isSpinning = false;
-    let currentStyle = 'cartoon';
     let surf = null;
+
+    function applyCartoonRibbon(v) {{
+      v.setStyle({{hetflag: false}}, {{cartoon: {{color: '#00BFA6', thickness: 0.45, style: 'oval', opacity: 0.95}}}});
+      // Highlight Catalytic Dyad in rich amber sticks
+      v.addStyle({{resi: [41, 145]}}, {{stick: {{colorscheme: 'orangeCarbon', radius: 0.35}}, sphere: {{scale: 0.25, colorscheme: 'orangeCarbon'}}}});
+      // Highlight bound inhibitor/ligand in yellow-green sticks
+      v.addStyle({{hetflag: true}}, {{stick: {{colorscheme: 'greenCarbon', radius: 0.28}}}});
+      v.addLabels([
+        {{text: "His41", position: {{resi: 41}}, fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 10}},
+        {{text: "Cys145", position: {{resi: 145}}, fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 10}}
+      ]);
+    }}
 
     document.addEventListener("DOMContentLoaded", function() {{
       let element = document.getElementById('gldiv');
-      let config = {{ backgroundColor: '#080F14' }};
+      let config = {{ backgroundColor: '#080F14', antialias: true }};
       viewer = $3Dmol.createViewer(element, config);
 
       $3Dmol.download('pdb:{pdb_id}', viewer, {{multimodel: false, frames: false}}, function() {{
-        viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.92 }} }});
-        viewer.addStyle({{ resi: [41, 145] }}, {{ stick: {{ colorscheme: 'amberCarbon', radius: 0.25 }} }});
-        viewer.addLabels([
-          {{ text: "His41", position: {{ resi: 41 }}, fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 10 }},
-          {{ text: "Cys145", position: {{ resi: 145 }}, fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 10 }}
-        ]);
+        applyCartoonRibbon(viewer);
         viewer.zoomTo();
         viewer.render();
       }});
@@ -276,33 +283,41 @@ with col_right:
       viewer.spin(isSpinning ? "y" : false);
     }}
 
-    function setStyle(styleType) {{
+    function setRibbonStyle() {{
       if (!viewer) return;
-      currentStyle = styleType;
       if (surf) {{ viewer.removeSurface(surf); surf = null; }}
-      
-      if (styleType === 'cartoon') {{
-        viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.92 }} }});
-        viewer.addStyle({{ resi: [41, 145] }}, {{ stick: {{ colorscheme: 'amberCarbon', radius: 0.25 }} }});
-      }} else if (styleType === 'surface') {{
-        viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.35 }} }});
-        surf = viewer.addSurface($3Dmol.SurfaceType.MS, {{ opacity: 0.65, color: '#161C24' }});
-      }}
+      applyCartoonRibbon(viewer);
+      viewer.render();
+    }}
+
+    function setSecondaryStructure() {{
+      if (!viewer) return;
+      if (surf) {{ viewer.removeSurface(surf); surf = null; }}
+      viewer.setStyle({{hetflag: false}}, {{cartoon: {{colorscheme: 'ssJmol', thickness: 0.45, opacity: 0.95}}}});
+      viewer.addStyle({{resi: [41, 145]}}, {{stick: {{colorscheme: 'orangeCarbon', radius: 0.35}}}});
+      viewer.addStyle({{hetflag: true}}, {{stick: {{colorscheme: 'greenCarbon', radius: 0.28}}}});
+      viewer.render();
+    }}
+
+    function setSurfaceStyle() {{
+      if (!viewer) return;
+      if (surf) {{ viewer.removeSurface(surf); surf = null; }}
+      viewer.setStyle({{hetflag: false}}, {{cartoon: {{color: '#00BFA6', opacity: 0.3}}}});
+      surf = viewer.addSurface($3Dmol.SurfaceType.MS, {{opacity: 0.65, color: '#161C24'}});
       viewer.render();
     }}
 
     function highlightBindingSite() {{
       if (!viewer) return;
-      viewer.zoomTo({{ resi: [41, 49, 140, 141, 142, 143, 145, 163, 165, 166, 187, 189] }});
+      viewer.zoomTo({{resi: [41, 49, 140, 141, 142, 143, 145, 163, 165, 166, 187, 189]}});
       viewer.render();
     }}
 
     function resetView() {{
       if (!viewer) return;
       if (isSpinning) {{ viewer.spin(false); isSpinning = false; }}
-      viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.92 }} }});
-      viewer.addStyle({{ resi: [41, 145] }}, {{ stick: {{ colorscheme: 'amberCarbon', radius: 0.25 }} }});
       if (surf) {{ viewer.removeSurface(surf); surf = null; }}
+      applyCartoonRibbon(viewer);
       viewer.zoomTo();
       viewer.render();
     }}
