@@ -136,8 +136,6 @@ def adapt_ranked_df(
 
         filt = FilterResult(
             status          = filter_status,
-            passed          = (filter_status == "PASS"),
-            property_score  = _safe_float(row.get("property_score", 1.0 if filter_status == "PASS" else 0.0)),
             reasons         = reasons_list,
         )
 

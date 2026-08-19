@@ -250,8 +250,12 @@ with col_right:
     let viewer = null;
     let isSpinning = false;
     let surf = null;
+    let initialView = null;
 
     function applyCartoonRibbon(v) {{
+      if (!v) return;
+      v.removeAllLabels();
+      v.setStyle({{}}, {{}});
       v.setStyle({{hetflag: false}}, {{cartoon: {{color: '#00BFA6', thickness: 0.45, style: 'oval', opacity: 0.95}}}});
       // Highlight Catalytic Dyad in rich amber sticks
       v.addStyle({{resi: [41, 145]}}, {{stick: {{color: '#F59E0B', radius: 0.35}}, sphere: {{scale: 0.25, color: '#F59E0B'}}}});
@@ -272,6 +276,9 @@ with col_right:
         applyCartoonRibbon(viewer);
         viewer.zoomTo();
         viewer.render();
+        try {{
+          initialView = viewer.getView();
+        }} catch (e) {{}}
       }});
     }});
 
@@ -291,6 +298,8 @@ with col_right:
     function setSecondaryStructure() {{
       if (!viewer) return;
       if (surf) {{ viewer.removeSurface(surf); surf = null; }}
+      viewer.removeAllLabels();
+      viewer.setStyle({{}}, {{}});
       viewer.setStyle({{hetflag: false}}, {{cartoon: {{colorscheme: 'ssJmol', thickness: 0.45, opacity: 0.95}}}});
       viewer.addStyle({{resi: [41, 145]}}, {{stick: {{colorscheme: 'orangeCarbon', radius: 0.35}}}});
       viewer.addStyle({{hetflag: true}}, {{stick: {{colorscheme: 'greenCarbon', radius: 0.28}}}});
@@ -300,8 +309,10 @@ with col_right:
     function setSurfaceStyle() {{
       if (!viewer) return;
       if (surf) {{ viewer.removeSurface(surf); surf = null; }}
+      viewer.removeAllLabels();
+      viewer.setStyle({{}}, {{}});
       viewer.setStyle({{hetflag: false}}, {{cartoon: {{color: '#00BFA6', opacity: 0.3}}}});
-      surf = viewer.addSurface($3Dmol.SurfaceType.MS, {{opacity: 0.65, color: '#161C24'}});
+      surf = viewer.addSurface($3Dmol.SurfaceType.MS, {{opacity: 0.45, color: '#00B4D8'}});
       viewer.render();
     }}
 
@@ -316,7 +327,11 @@ with col_right:
       if (isSpinning) {{ viewer.spin(false); isSpinning = false; }}
       if (surf) {{ viewer.removeSurface(surf); surf = null; }}
       applyCartoonRibbon(viewer);
-      viewer.zoomTo();
+      if (initialView) {{
+        viewer.setView(initialView);
+      }} else {{
+        viewer.zoomTo();
+      }}
       viewer.render();
     }}
   </script>
