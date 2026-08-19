@@ -257,7 +257,7 @@ with col_right:
     function applyCartoonRibbon(v) {{
       if (!v) return;
       v.removeAllLabels();
-      v.setStyle({}, {});
+      v.setStyle({{}}, {{}});
       v.setStyle({{hetflag: false}}, {{cartoon: {{color: '#00BFA6', thickness: 0.45, style: 'oval', opacity: 0.95}}}});
       // Highlight Catalytic Dyad in rich amber sticks
       v.addStyle({{resi: [41, 145]}}, {{stick: {{color: '#F59E0B', radius: 0.35}}, sphere: {{scale: 0.25, color: '#F59E0B'}}}});
@@ -301,7 +301,7 @@ with col_right:
       if (!viewer) return;
       if (surf) {{ viewer.removeSurface(surf); surf = null; }}
       viewer.removeAllLabels();
-      viewer.setStyle({}, {});
+      viewer.setStyle({{}}, {{}});
       viewer.setStyle({{hetflag: false}}, {{cartoon: {{colorscheme: 'ssJmol', thickness: 0.45, opacity: 0.95}}}});
       viewer.addStyle({{resi: [41, 145]}}, {{stick: {{colorscheme: 'orangeCarbon', radius: 0.35}}}});
       viewer.addStyle({{hetflag: true}}, {{stick: {{colorscheme: 'greenCarbon', radius: 0.28}}}});
@@ -312,7 +312,7 @@ with col_right:
       if (!viewer) return;
       if (surf) {{ viewer.removeSurface(surf); surf = null; }}
       viewer.removeAllLabels();
-      viewer.setStyle({}, {});
+      viewer.setStyle({{}}, {{}});
       viewer.setStyle({{hetflag: false}}, {{cartoon: {{color: '#00BFA6', opacity: 0.3}}}});
       surf = viewer.addSurface($3Dmol.SurfaceType.MS, {{opacity: 0.65, color: '#161C24'}});
       viewer.render();
