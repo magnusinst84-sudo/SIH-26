@@ -357,48 +357,6 @@ def render_property_radar(
 
 
 # ---------------------------------------------------------------------------
-# Top Navbar & Stepper
-# ---------------------------------------------------------------------------
-
-def render_top_navbar() -> None:
-    """Render a clean horizontal top navbar."""
-    c_brand, c0, c1, c2, c3, c4, c5, c6, c7 = st.columns(
-        [1.6, 0.7, 1.1, 1.1, 1.0, 1.2, 1.1, 1.0, 0.8],
-        gap="small"
-    )
-    
-    with c_brand:
-        st.markdown(
-            '<a href="http://localhost:8501" style="text-decoration:none; display:flex; align-items:center;">'
-            '<svg viewBox="0 0 24 24" width="18" height="18" stroke="#00BFA6" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px; margin-bottom:2px;">'
-            '<circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/>'
-            '<line x1="12" y1="7.5" x2="6.5" y2="15.5"/><line x1="12" y1="7.5" x2="17.5" y2="15.5"/><line x1="7.5" y1="18" x2="16.5" y2="18"/>'
-            '</svg>'
-            '<span style="font-size: 16px; font-weight:700; color:#F8FAFC !important;">'
-            'Target<span style="color:#00BFA6;">Forge</span>'
-            '</span>'
-            '</a>',
-            unsafe_allow_html=True
-        )
-        
-    with c0:
-        st.page_link("pages/01_home.py", label="Home", icon=":material/home:")
-    with c1:
-        st.page_link("pages/02_target_explorer.py", label="Target Explorer", icon=":material/track_changes:")
-    with c2:
-        st.page_link("pages/03_dataset_manager.py", label="Dataset Manager", icon=":material/database:")
-    with c3:
-        st.page_link("pages/04_ai_screening.py", label="AI Screening", icon=":material/hub:")
-    with c4:
-        st.page_link("pages/05_candidate_design.py", label="Candidate Design", icon=":material/science:")
-    with c5:
-        st.page_link("pages/06_docking_analysis.py", label="Docking Analysis", icon=":material/join_inner:")
-    with c6:
-        st.page_link("pages/07_final_ranking.py", label="Final Ranking", icon=":material/leaderboard:")
-    with c7:
-        st.page_link("pages/08_reports.py", label="Reports", icon=":material/description:")
-        
-    st.markdown('<hr style="margin: 4px 0 16px 0; border-color: #232D38;">', unsafe_allow_html=True)
 
 
 def render_horizontal_stepper(current_step: WorkflowStep) -> None:

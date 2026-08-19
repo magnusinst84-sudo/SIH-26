@@ -19,7 +19,6 @@ import streamlit as st
 from src.ui.state import init_session_state, WorkflowStep
 from src.ui.theme import inject_global_css, badge_html, COLORS
 from src.ui.components import (
-    render_top_navbar,
     render_horizontal_stepper,
     render_scientific_disclaimer,
     render_demo_banner,
@@ -31,7 +30,6 @@ from src.ui.charts import score_distribution_histogram, activity_docking_scatter
 
 inject_global_css()
 init_session_state(_ROOT)
-render_top_navbar()
 render_horizontal_stepper(WorkflowStep.SCREENING)
 render_step_gate(WorkflowStep.SCREENING)
 render_demo_banner()
