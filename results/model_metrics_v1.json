@@ -1,0 +1,80 @@
+{
+  "model_type": "RandomForestClassifier",
+  "n_estimators": 100,
+  "class_weight_balanced": true,
+  "random_seed": 42,
+  "max_depth": null,
+  "roc_auc": 0.766011,
+  "pr_auc": 0.466373,
+  "precision": 0.8125,
+  "recall": 0.209677,
+  "f1": 0.333333,
+  "confusion_matrix": [
+    [
+      340,
+      3
+    ],
+    [
+      49,
+      13
+    ]
+  ],
+  "feature_importance": [
+    {
+      "rank": 1,
+      "name": "logp",
+      "importance": 0.0332776
+    },
+    {
+      "rank": 2,
+      "name": "mw",
+      "importance": 0.02818909
+    },
+    {
+      "rank": 3,
+      "name": "tpsa",
+      "importance": 0.01552681
+    },
+    {
+      "rank": 4,
+      "name": "rotatable_bonds",
+      "importance": 0.00997654
+    },
+    {
+      "rank": 5,
+      "name": "fingerprint_429",
+      "importance": 0.00824138
+    },
+    {
+      "rank": 6,
+      "name": "hba",
+      "importance": 0.00697196
+    },
+    {
+      "rank": 7,
+      "name": "fingerprint_1855",
+      "importance": 0.00675267
+    },
+    {
+      "rank": 8,
+      "name": "fingerprint_1109",
+      "importance": 0.00632545
+    },
+    {
+      "rank": 9,
+      "name": "fingerprint_1088",
+      "importance": 0.00572096
+    },
+    {
+      "rank": 10,
+      "name": "hbd",
+      "importance": 0.00564922
+    }
+  ],
+  "train_samples": 1620,
+  "test_samples": 405,
+  "n_active_train": 343,
+  "n_inactive_train": 1277,
+  "n_active_test": 62,
+  "n_inactive_test": 343
+}

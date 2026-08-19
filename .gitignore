@@ -12,3 +12,8 @@ results/*.json
 
 # Data files
 data/raw/*.csv
+
+!models/mpro_activity_rf_v1.pkl
+!results/model_metrics_v1.json
+!results/fallback_predictions.csv
+!data/raw/mpro_labeled_smiles.csv

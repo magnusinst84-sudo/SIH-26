@@ -22,7 +22,8 @@ import numpy as np
 import pandas as pd
 
 # Force UTF-8 stdout on Windows
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if hasattr(sys.stdout, "buffer"):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 log = logging.getLogger(__name__)
 
