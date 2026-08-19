@@ -141,10 +141,9 @@ def adapt_ranked_df(
 
         docking_raw = row.get("docking_score")
         dock = DockingResult(
-            score_raw       = _safe_float(docking_raw) if pd.notna(docking_raw) else None,
-            score_norm      = _safe_float(row.get("docking_norm", 0.0)),
-            source          = str(row.get("docking_source", "FALLBACK_DEMO")),
-            is_demo         = True,
+            score_raw        = _safe_float(docking_raw) if pd.notna(docking_raw) else None,
+            score_normalized = _safe_float(row.get("docking_norm", 0.0)),
+            docking_status   = str(row.get("docking_source", "FALLBACK_DEMO")),
         )
 
         candidate = FrontendCandidate(
