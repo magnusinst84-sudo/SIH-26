@@ -314,7 +314,7 @@ with col_right:
       viewer.removeAllLabels();
       viewer.setStyle({{}}, {{}});
       viewer.setStyle({{hetflag: false}}, {{cartoon: {{color: '#00BFA6', opacity: 0.3}}}});
-      surf = viewer.addSurface($3Dmol.SurfaceType.MS, {{opacity: 0.65, color: '#161C24'}});
+      surf = viewer.addSurface($3Dmol.SurfaceType.MS, {{opacity: 0.45, color: '#00B4D8'}});
       viewer.render();
     }}
 
