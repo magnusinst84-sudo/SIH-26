@@ -95,6 +95,8 @@ with col_sliders:
         for key in ["sl_mw", "sl_lp", "sl_hbd", "sl_hba", "sl_tps", "sl_rb"]:
             if key in st.session_state:
                 del st.session_state[key]
+        if "tf_ui_filter_config" in st.session_state:
+            del st.session_state["tf_ui_filter_config"]
         st.rerun()
 
 # Apply reactive filters
