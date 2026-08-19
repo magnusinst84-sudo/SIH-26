@@ -55,14 +55,10 @@ with tab_demo:
             with st.spinner("Validating SMILES structures and calculating descriptors…"):
                 from src.data.loader import load_compounds
                 from src.data.validator import validate_compounds
+                from src.chemistry.descriptors import calculate_descriptors
                 frame = load_compounds(demo_path)
                 valid_df, rejected_df = validate_compounds(frame)
-                existing_valid = _ROOT / "results" / "validated_molecules.csv"
-                if existing_valid.exists():
-                    try:
-                        valid_df = pd.read_csv(existing_valid)
-                    except Exception:
-                        pass
+                valid_df = calculate_descriptors(valid_df)
                 st.session_state["tf_raw_df"]       = frame
                 st.session_state["tf_validated_df"]  = valid_df
                 st.session_state["tf_rejected_df"]   = rejected_df
@@ -93,9 +89,11 @@ with tab_upload:
             else:
                 st.caption(f"**{len(raw_df)} compounds** loaded from uploaded file.")
                 if st.button("Validate Uploaded Compounds", type="primary", key="validate_upload"):
-                    with st.spinner("Validating SMILES structures…"):
+                    with st.spinner("Validating SMILES structures and calculating descriptors…"):
                         from src.data.validator import validate_compounds
+                        from src.chemistry.descriptors import calculate_descriptors
                         valid_df, rejected_df = validate_compounds(raw_df)
+                        valid_df = calculate_descriptors(valid_df)
                         st.session_state["tf_raw_df"]       = raw_df
                         st.session_state["tf_validated_df"]  = valid_df
                         st.session_state["tf_rejected_df"]   = rejected_df
