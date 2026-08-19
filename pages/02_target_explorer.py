@@ -3,12 +3,12 @@ pages/02_target_explorer.py
 ---------------------------
 TargetForge — Target Explorer
 
-Scientific target analysis workspace displaying:
+Compact Scientific Target Analysis Workspace:
 1. Disease & Molecular Target selection
-2. Target biological profile & validation summary
-3. Binding pocket geometry & catalytic residue specifications
-4. Evidence & Literature citations
-5. Interactive 3D structural protein visualization (PDB: 6LU7)
+2. Target Summary card & biological profile
+3. Catalytic binding pocket metrics & subsite details
+4. Validation evidence & literature citations
+5. Centered 3D protein structure preview (PDB: 6LU7) with interactive controls
 
 Owned by: M4 (Frontend/UI Lead)
 """
@@ -38,25 +38,30 @@ render_top_navbar()
 render_horizontal_stepper(WorkflowStep.TARGET)
 render_demo_banner()
 
-# ─── Page Header ─────────────────────────────────────────────────────────────
-st.title("Target Explorer")
-st.caption("Biological target validation, binding pocket analysis, and structural receptor workspace.")
+# ─── Compact Page Header ─────────────────────────────────────────────────────
+st.markdown(
+    """<div style="margin-bottom: 8px;">
+<h2 style="font-size: 20px; font-weight: 700; color: #F8FAFC; margin: 0 0 2px 0;">Target Explorer</h2>
+<p style="font-size: 12px; color: #A1ABB3; margin: 0;">Biological target validation, binding pocket analysis, and structural receptor workspace.</p>
+</div>""",
+    unsafe_allow_html=True,
+)
 
 # ─── Retrieve State Data ─────────────────────────────────────────────────────
 target  = st.session_state.get("tf_target", {})
 weights = st.session_state.get("tf_weights", {})
 filters = st.session_state.get("tf_filter_config", {})
 
-# ─── Two-Column Scientific Workspace Layout ──────────────────────────────────
-col_left, col_right = st.columns([1.1, 1.25], gap="large")
+# ─── Two-Column Compact Scientific Workspace ─────────────────────────────────
+col_left, col_right = st.columns([1.1, 1.25], gap="medium")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# LEFT COLUMN: Selection, Target Profile, Pocket, Evidence, CTA
+# LEFT COLUMN: Target Selection, Summary Card, Pocket, Evidence, CTA
 # ══════════════════════════════════════════════════════════════════════════════
 with col_left:
     
-    # 1. Scientific Form Selectors
-    st.markdown("### Target Specification")
+    # 1. Target Specification Selectors
+    st.markdown("<h4 style='font-size: 13.5px; font-weight: 600; color: #F8FAFC; margin: 0 0 6px 0;'>Target Specification</h4>", unsafe_allow_html=True)
     
     disease_options = [
         "COVID-19 (Viral Infectious Disease)",
@@ -67,6 +72,7 @@ with col_left:
         "Disease Indication",
         options=disease_options,
         index=0,
+        label_visibility="visible",
         help="Select clinical indication for target prioritization.",
     )
     
@@ -79,262 +85,243 @@ with col_left:
         "Molecular Target",
         options=target_options,
         index=0,
+        label_visibility="visible",
         help="Select validated biological macromolecule receptor.",
     )
     
-    st.markdown("")
+    st.markdown("<div style='margin-top: 6px;'></div>", unsafe_allow_html=True)
 
-    # 2. Target Summary Key-Value Rows
-    st.markdown("### Target Biological Profile")
-    st.markdown('<div class="tf-card" style="padding:16px 20px; margin-bottom:16px;">', unsafe_allow_html=True)
+    # 2. Compact Target Summary Card
+    st.markdown("<h4 style='font-size: 13.5px; font-weight: 600; color: #F8FAFC; margin: 0 0 6px 0;'>Target Summary</h4>", unsafe_allow_html=True)
     
-    profile_rows = [
-        ("Gene Name", "Mpro / nsp5"),
-        ("UniProt ID", "P0DTD1"),
-        ("Protein Class", "Cysteine Protease (Chymotrypsin-like)"),
-        ("Organism", "SARS-CoV-2 (Human Host)"),
-        ("Druggability", "High (Class I Catalytic Pocket)"),
-        ("Biological Function", "Cleavage of viral polyproteins pp1a and pp1ab"),
-        ("Structure Method", "X-ray Crystallography (2.16 Å Resolution)"),
-    ]
-    for label, val in profile_rows:
-        r1, r2 = st.columns([1.1, 1.6])
-        r1.markdown(f"<span style='font-size:13px;color:#A1ABB3;'>{label}</span>", unsafe_allow_html=True)
-        r2.markdown(f"<span style='font-size:13px;color:#F8FAFC;font-weight:600;'>{val}</span>", unsafe_allow_html=True)
-        
-    st.markdown("</div>", unsafe_allow_html=True)
+    summary_card_html = """<div class="tf-card" style="padding: 10px 14px; margin-bottom: 8px;">
+<div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 4px 12px; font-size: 12px;">
+<div style="color: #A1ABB3;">Gene Name</div><div style="color: #F8FAFC; font-weight: 600;">Mpro / nsp5</div>
+<div style="color: #A1ABB3;">UniProt ID</div><div style="color: #00BFA6; font-weight: 600;">P0DTD1</div>
+<div style="color: #A1ABB3;">Protein Class</div><div style="color: #F8FAFC; font-weight: 500;">Cysteine Protease</div>
+<div style="color: #A1ABB3;">Organism</div><div style="color: #F8FAFC; font-weight: 500;">SARS-CoV-2</div>
+<div style="color: #A1ABB3;">Druggability</div><div style="color: #10B981; font-weight: 600;">High (Class I Pocket)</div>
+<div style="color: #A1ABB3;">Function</div><div style="color: #F8FAFC; font-weight: 500;">Cleaves viral pp1a / pp1ab</div>
+<div style="color: #A1ABB3;">Structure Method</div><div style="color: #F8FAFC; font-weight: 500;">X-ray (2.16 Å Resolution)</div>
+</div>
+</div>"""
+    st.markdown(summary_card_html, unsafe_allow_html=True)
 
-    # 3. Binding Pocket Summary
-    st.markdown("### Catalytic Binding Pocket")
-    st.markdown('<div class="tf-card" style="padding:16px 20px; margin-bottom:16px;">', unsafe_allow_html=True)
+    # 3. Catalytic Binding Pocket
+    st.markdown("<h4 style='font-size: 13.5px; font-weight: 600; color: #F8FAFC; margin: 0 0 6px 0;'>Catalytic Binding Pocket</h4>", unsafe_allow_html=True)
     
-    pk_col1, pk_col2 = st.columns(2)
-    with pk_col1:
-        render_scientific_metric("Pocket Volume", "342 Å³", "Enclosed cavity volume")
-    with pk_col2:
-        render_scientific_metric("Druggability Index", "0.84", "High tractability score")
-        
-    st.markdown("<div style='margin-top:12px;'>", unsafe_allow_html=True)
-    pocket_details = [
-        ("Catalytic Dyad", "His41 (General Base), Cys145 (Nucleophile)"),
-        ("S1 Subsite", "Phe140, Leu141, Asn142, Gly143, His163, Glu166"),
-        ("S2 Subsite (Hydrophobic)", "Met49, Tyr54, Met165, Asp187, Arg188"),
-        ("S4 Subsite (Flexible)", "Leu167, Pro168, Thr190, Ala191, Gln192"),
-    ]
-    for p_lbl, p_val in pocket_details:
-        pr1, pr2 = st.columns([1.1, 1.6])
-        pr1.markdown(f"<span style='font-size:12px;color:#A1ABB3;'>{p_lbl}</span>", unsafe_allow_html=True)
-        pr2.markdown(f"<span style='font-size:12px;color:#F8FAFC;font-weight:500;'>{p_val}</span>", unsafe_allow_html=True)
-    st.markdown("</div></div>", unsafe_allow_html=True)
+    pocket_card_html = """<div class="tf-card" style="padding: 10px 14px; margin-bottom: 8px;">
+<div style="display: flex; gap: 10px; margin-bottom: 8px;">
+<div style="flex: 1; background: #161C24; border: 1px solid #232D38; border-radius: 6px; padding: 6px 10px;">
+<div style="font-size: 10px; color: #A1ABB3; font-weight: 600; text-transform: uppercase;">Pocket Volume</div>
+<div style="font-size: 15px; font-weight: 700; color: #F8FAFC;">342 Å³</div>
+</div>
+<div style="flex: 1; background: #161C24; border: 1px solid #232D38; border-radius: 6px; padding: 6px 10px;">
+<div style="font-size: 10px; color: #A1ABB3; font-weight: 600; text-transform: uppercase;">Druggability Index</div>
+<div style="font-size: 15px; font-weight: 700; color: #00BFA6;">0.84</div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 4px 10px; font-size: 11.5px;">
+<div style="color: #A1ABB3;">Catalytic Dyad</div><div style="color: #F59E0B; font-weight: 600;">His41, Cys145</div>
+<div style="color: #A1ABB3;">S1 Subsite</div><div style="color: #F8FAFC;">Phe140, Leu141, Asn142, His163</div>
+<div style="color: #A1ABB3;">S2 Subsite</div><div style="color: #F8FAFC;">Met49, Tyr54, Met165, Asp187</div>
+<div style="color: #A1ABB3;">S4 Subsite</div><div style="color: #F8FAFC;">Leu167, Pro168, Thr190, Gln192</div>
+</div>
+</div>"""
+    st.markdown(pocket_card_html, unsafe_allow_html=True)
 
-    # 4. Evidence & Literature Citations
-    st.markdown("### Validation Evidence & Literature")
-    st.markdown('<div class="tf-card" style="padding:16px 20px; margin-bottom:20px;">', unsafe_allow_html=True)
+    # 4. Validation Evidence & Literature
+    st.markdown("<h4 style='font-size: 13.5px; font-weight: 600; color: #F8FAFC; margin: 0 0 6px 0;'>Validation Evidence & Literature</h4>", unsafe_allow_html=True)
     
-    evidence_items = [
-        ("Structure of Mpro from SARS-CoV-2 and discovery of its inhibitors", "Jin et al., Nature (2020) 582:289–293", "PDB: 6LU7"),
-        ("Crystal structure of SARS-CoV-2 main protease provides basis for design of improved α-ketoamide inhibitors", "Zhang et al., Science (2020) 368:409–412", "PDB: 6Y2F"),
-        ("Mechanistic insights into catalytic dyad inhibition and SARS-CoV-2 antiviral discovery", "Hilgenfeld et al., J. Med. Chem. (2021) 64:124–139", "Target Validation"),
-    ]
-    
-    for title_text, citation, tag in evidence_items:
-        st.markdown(
-            f"""
-            <div style="padding: 8px 0; border-bottom: 1px solid #232D38;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-                    <div style="font-size:13px; font-weight:600; color:#F8FAFC; line-height:1.35;">
-                        <span style="color:#00BFA6; margin-right:4px;">▪</span> {title_text}
-                    </div>
-                    <span class="tf-badge tf-badge-pass" style="white-space:nowrap; font-size:10px;">{tag}</span>
-                </div>
-                <div style="font-size:11px; color:#A1ABB3; margin-top:3px; margin-left:12px;">{citation}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    st.markdown("</div>", unsafe_allow_html=True)
+    literature_html = """<div class="tf-card" style="padding: 10px 14px; margin-bottom: 12px;">
+<div style="padding: 4px 0; border-bottom: 1px solid #232D38;">
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<span style="font-size:12px; font-weight:600; color:#F8FAFC;"><span style="color:#00BFA6;">▪</span> Structure of Mpro from SARS-CoV-2 and inhibitor discovery</span>
+<span class="tf-badge tf-badge-pass">PDB: 6LU7</span>
+</div>
+<div style="font-size:11px; color:#A1ABB3; margin-left:10px;">Jin et al., Nature (2020) 582:289–293</div>
+</div>
+<div style="padding: 4px 0; margin-top: 4px;">
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<span style="font-size:12px; font-weight:600; color:#F8FAFC;"><span style="color:#00BFA6;">▪</span> Crystal structure of main protease with α-ketoamide inhibitors</span>
+<span class="tf-badge tf-badge-pass">PDB: 6Y2F</span>
+</div>
+<div style="font-size:11px; color:#A1ABB3; margin-left:10px;">Zhang et al., Science (2020) 368:409–412</div>
+</div>
+</div>"""
+    st.markdown(literature_html, unsafe_allow_html=True)
 
     # 5. Primary Confirm Target CTA Button
     if st.button("Confirm Target & Continue →", type="primary", use_container_width=True):
         st.page_link("pages/03_dataset_manager.py", label="Proceed to Dataset Manager →", icon=":material/database:")
-        st.success("Target profile locked for pipeline execution.")
+        st.success("Target profile confirmed and locked.")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# RIGHT COLUMN: 3D Protein Structure Preview & Interactive Controls
+# RIGHT COLUMN: Centered 3D Protein Structure Workspace
 # ══════════════════════════════════════════════════════════════════════════════
 with col_right:
-    st.markdown("### Protein Structure Workspace")
+    st.markdown("<h4 style='font-size: 13.5px; font-weight: 600; color: #F8FAFC; margin: 0 0 6px 0;'>Protein Structure Workspace</h4>", unsafe_allow_html=True)
     
-    st.markdown(
-        """
-        <div style="background:#11161D; border:1px solid #232D38; border-radius:10px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.2);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #232D38; padding-bottom:8px;">
-                <div>
-                    <span style="font-size:14px; font-weight:700; color:#F8FAFC;">SARS-CoV-2 Main Protease (Mpro)</span>
-                    <span style="font-size:12px; color:#A1ABB3; margin-left:8px;">PDB ID: <strong style="color:#00BFA6;">6LU7</strong></span>
-                </div>
-                <span class="tf-badge tf-badge-pass">X-ray 2.16 Å</span>
-            </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    
-    # Interactive 3Dmol.js HTML Component
     pdb_id = target.get("structure_id", "6LU7")
     
-    mol_html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.0.4/3Dmol-min.js"></script>
-      <style>
-        body {{ margin: 0; padding: 0; background-color: #080F14; overflow: hidden; font-family: 'Inter', sans-serif; }}
-        #viewer-container {{ width: 100%; height: 420px; position: relative; border-radius: 6px; overflow: hidden; background: linear-gradient(180deg, #080F14 0%, #11161D 100%); }}
-        .controls-overlay {{
-          position: absolute;
-          bottom: 12px;
-          left: 12px;
-          right: 12px;
-          display: flex;
-          gap: 6px;
-          z-index: 100;
-          background: rgba(17, 22, 29, 0.90);
-          backdrop-filter: blur(8px);
-          border: 1px solid #232D38;
-          padding: 6px 10px;
-          border-radius: 6px;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        }}
-        .btn-ctrl {{
-          background: #161C24;
-          border: 1px solid #232D38;
-          color: #F8FAFC;
-          padding: 4px 8px;
-          font-size: 11px;
-          font-weight: 600;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: all 0.15s ease;
-        }}
-        .btn-ctrl:hover {{
-          background: #00BFA6;
-          border-color: #00BFA6;
-          color: #080F14;
-        }}
-        .legend-tag {{
-          font-size: 11px;
-          color: #A1ABB3;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          margin-left: auto;
-        }}
-        .legend-dot {{
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          display: inline-block;
-        }}
-      </style>
-    </head>
-    <body>
-      <div id="viewer-container">
-        <div id="gldiv" style="width: 100%; height: 100%;"></div>
-        <div class="controls-overlay">
-          <button class="btn-ctrl" onclick="toggleSpin()">Spin</button>
-          <button class="btn-ctrl" onclick="setStyle('cartoon')">Ribbon</button>
-          <button class="btn-ctrl" onclick="setStyle('surface')">Surface</button>
-          <button class="btn-ctrl" onclick="highlightBindingSite()">Catalytic Site</button>
-          <button class="btn-ctrl" onclick="resetView()">Reset</button>
-          <div class="legend-tag">
-            <span class="legend-dot" style="background:#00BFA6;"></span> Monomer A
-            <span class="legend-dot" style="background:#F59E0B; margin-left:6px;"></span> His41/Cys145
-          </div>
-        </div>
-      </div>
-
-      <script>
-        let viewer = null;
-        let isSpinning = false;
-        let currentStyle = 'cartoon';
-        let surf = null;
-
-        document.addEventListener("DOMContentLoaded", function() {{
-          let element = document.getElementById('gldiv');
-          let config = {{ backgroundColor: '#080F14' }};
-          viewer = $3Dmol.createViewer(element, config);
-
-          $3Dmol.download('pdb:{pdb_id}', viewer, {{multimodel: false, frames: false}}, function() {{
-            viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.92 }} }});
-            // Highlight Catalytic Dyad
-            viewer.addStyle({{ resi: [41, 145] }}, {{ stick: {{ colorscheme: 'amberCarbon', radius: 0.25 }} }});
-            viewer.addLabels([
-              {{ text: "His41", position: {{ resi: 41 }}, fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 11 }},
-              {{ text: "Cys145", position: {{ resi: 145 }}, fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 11 }}
-            ]);
-            viewer.zoomTo();
-            viewer.render();
-          }});
-        }});
-
-        function toggleSpin() {{
-          if (!viewer) return;
-          isSpinning = !isSpinning;
-          viewer.spin(isSpinning ? "y" : false);
-        }}
-
-        function setStyle(styleType) {{
-          if (!viewer) return;
-          currentStyle = styleType;
-          if (surf) {{ viewer.removeSurface(surf); surf = null; }}
-          
-          if (styleType === 'cartoon') {{
-            viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.92 }} }});
-            viewer.addStyle({{ resi: [41, 145] }}, {{ stick: {{ colorscheme: 'amberCarbon', radius: 0.25 }} }});
-          }} else if (styleType === 'surface') {{
-            viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.35 }} }});
-            surf = viewer.addSurface($3Dmol.SurfaceType.MS, {{ opacity: 0.7, color: '#161C24' }});
-          }}
-          viewer.render();
-        }}
-
-        function highlightBindingSite() {{
-          if (!viewer) return;
-          viewer.zoomTo({{ resi: [41, 49, 140, 141, 142, 143, 145, 163, 165, 166, 187, 189] }});
-          viewer.render();
-        }}
-
-        function resetView() {{
-          if (!viewer) return;
-          if (isSpinning) {{ viewer.spin(false); isSpinning = false; }}
-          viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.92 }} }});
-          viewer.addStyle({{ resi: [41, 145] }}, {{ stick: {{ colorscheme: 'amberCarbon', radius: 0.25 }} }});
-          if (surf) {{ viewer.removeSurface(surf); surf = null; }}
-          viewer.zoomTo();
-          viewer.render();
-        }}
-      </script>
-    </body>
-    </html>
-    """
-    
-    components.html(mol_html, height=430)
-    
     st.markdown(
-        """
-        <div style="font-size:12px; color:#A1ABB3; margin-top:8px; line-height:1.4;">
-            <strong>Structure Notes:</strong> The SARS-CoV-2 Mpro homodimer active site features a non-canonical Cys-His catalytic dyad located at the cleft between Domain I and Domain II. Left-click and drag to rotate, right-click to translate, scroll to zoom.
-        </div>
-        </div>
-        """,
+        """<div class="tf-card" style="padding: 12px 14px 10px 14px; margin-bottom: 8px;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; border-bottom: 1px solid #232D38; padding-bottom: 6px;">
+<div>
+<span style="font-size: 13.5px; font-weight: 700; color: #F8FAFC;">Protein Structure Preview</span>
+<span style="font-size: 11.5px; color: #A1ABB3; margin-left: 8px;">PDB ID: <strong style="color: #00BFA6;">6LU7</strong></span>
+</div>
+<span class="tf-badge tf-badge-pass">X-ray 2.16 Å</span>
+</div>""",
         unsafe_allow_html=True,
     )
     
-    # Multi-Objective Scoring Configuration Panel
-    st.markdown("<div style='margin-top:16px;'></div>", unsafe_allow_html=True)
-    with st.expander("Multi-Objective Optimization Weights & Thresholds", expanded=False):
+    mol_html = f"""<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.0.4/3Dmol-min.js"></script>
+  <style>
+    body {{ margin: 0; padding: 0; background-color: #080F14; overflow: hidden; font-family: 'Inter', sans-serif; }}
+    #viewer-container {{ width: 100%; height: 380px; position: relative; border-radius: 6px; overflow: hidden; background: radial-gradient(circle at center, #11161D 0%, #080F14 100%); }}
+    .controls-overlay {{
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      right: 8px;
+      display: flex;
+      gap: 5px;
+      z-index: 100;
+      background: rgba(17, 22, 29, 0.88);
+      backdrop-filter: blur(8px);
+      border: 1px solid #232D38;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }}
+    .btn-ctrl {{
+      background: #161C24;
+      border: 1px solid #232D38;
+      color: #F8FAFC;
+      padding: 3px 7px;
+      font-size: 10.5px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }}
+    .btn-ctrl:hover {{
+      background: #00BFA6;
+      border-color: #00BFA6;
+      color: #080F14;
+    }}
+    .legend-tag {{
+      font-size: 10.5px;
+      color: #A1ABB3;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      margin-left: auto;
+    }}
+    .legend-dot {{
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }}
+  </style>
+</head>
+<body>
+  <div id="viewer-container">
+    <div id="gldiv" style="width: 100%; height: 100%;"></div>
+    <div class="controls-overlay">
+      <button class="btn-ctrl" onclick="toggleSpin()">Spin</button>
+      <button class="btn-ctrl" onclick="setStyle('cartoon')">Ribbon</button>
+      <button class="btn-ctrl" onclick="setStyle('surface')">Surface</button>
+      <button class="btn-ctrl" onclick="highlightBindingSite()">Catalytic Site</button>
+      <button class="btn-ctrl" onclick="resetView()">Reset</button>
+      <div class="legend-tag">
+        <span class="legend-dot" style="background:#00BFA6;"></span> Ribbon
+        <span class="legend-dot" style="background:#F59E0B; margin-left:4px;"></span> His41/Cys145
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let viewer = null;
+    let isSpinning = false;
+    let currentStyle = 'cartoon';
+    let surf = null;
+
+    document.addEventListener("DOMContentLoaded", function() {{
+      let element = document.getElementById('gldiv');
+      let config = {{ backgroundColor: '#080F14' }};
+      viewer = $3Dmol.createViewer(element, config);
+
+      $3Dmol.download('pdb:{pdb_id}', viewer, {{multimodel: false, frames: false}}, function() {{
+        viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.92 }} }});
+        viewer.addStyle({{ resi: [41, 145] }}, {{ stick: {{ colorscheme: 'amberCarbon', radius: 0.25 }} }});
+        viewer.addLabels([
+          {{ text: "His41", position: {{ resi: 41 }}, fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 10 }},
+          {{ text: "Cys145", position: {{ resi: 145 }}, fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 10 }}
+        ]);
+        viewer.zoomTo();
+        viewer.render();
+      }});
+    }});
+
+    function toggleSpin() {{
+      if (!viewer) return;
+      isSpinning = !isSpinning;
+      viewer.spin(isSpinning ? "y" : false);
+    }}
+
+    function setStyle(styleType) {{
+      if (!viewer) return;
+      currentStyle = styleType;
+      if (surf) {{ viewer.removeSurface(surf); surf = null; }}
+      
+      if (styleType === 'cartoon') {{
+        viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.92 }} }});
+        viewer.addStyle({{ resi: [41, 145] }}, {{ stick: {{ colorscheme: 'amberCarbon', radius: 0.25 }} }});
+      }} else if (styleType === 'surface') {{
+        viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.35 }} }});
+        surf = viewer.addSurface($3Dmol.SurfaceType.MS, {{ opacity: 0.65, color: '#161C24' }});
+      }}
+      viewer.render();
+    }}
+
+    function highlightBindingSite() {{
+      if (!viewer) return;
+      viewer.zoomTo({{ resi: [41, 49, 140, 141, 142, 143, 145, 163, 165, 166, 187, 189] }});
+      viewer.render();
+    }}
+
+    function resetView() {{
+      if (!viewer) return;
+      if (isSpinning) {{ viewer.spin(false); isSpinning = false; }}
+      viewer.setStyle({{}}, {{ cartoon: {{ color: '#00BFA6', opacity: 0.92 }} }});
+      viewer.addStyle({{ resi: [41, 145] }}, {{ stick: {{ colorscheme: 'amberCarbon', radius: 0.25 }} }});
+      if (surf) {{ viewer.removeSurface(surf); surf = null; }}
+      viewer.zoomTo();
+      viewer.render();
+    }}
+  </script>
+</body>
+</html>
+"""
+    components.html(mol_html, height=386)
+    
+    st.markdown(
+        """<div style="font-size:11px; color:#A1ABB3; margin-top:6px; line-height:1.4;">
+<strong>Structure Notes:</strong> SARS-CoV-2 Mpro catalytic dyad (His41/Cys145) highlighted in amber. Drag to rotate, scroll to zoom.
+</div>
+</div>""",
+        unsafe_allow_html=True,
+    )
+    
+    # Compact scoring configuration expander
+    with st.expander("Multi-Objective Scoring Weights & Thresholds", expanded=False):
         from src.ui.charts import weights_bar
         st.plotly_chart(weights_bar(weights), use_container_width=True)
         

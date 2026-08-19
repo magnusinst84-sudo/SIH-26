@@ -107,56 +107,98 @@ html, body, .stApp {{
     background-color: #080F14 !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: #F8FAFC !important;
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 13px;
+    line-height: 1.45;
 }}
 
-/* ─── Main Content Container ───────────────────────────────── */
+/* ─── Main Content Container (Compact & Dense) ─────────────── */
 .main .block-container {{
-    padding-top: 1.25rem !important;
-    padding-bottom: 2.5rem !important;
-    padding-left: 2rem !important;
-    padding-right: 2rem !important;
+    padding-top: 0.85rem !important;
+    padding-bottom: 2rem !important;
+    padding-left: 1.75rem !important;
+    padding-right: 1.75rem !important;
     max-width: 1260px;
 }}
 
-/* ─── Sidebar Styling ──────────────────────────────────────── */
+/* ─── Sidebar Styling (High Contrast & Clear Hierarchy) ────── */
 [data-testid="stSidebar"] {{
     background-color: #11161D !important;
     border-right: 1px solid #232D38 !important;
-    width: 250px !important;
-    min-width: 250px !important;
-    max-width: 250px !important;
-    padding-top: 1rem !important;
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    padding-top: 0.8rem !important;
     font-family: 'Inter', sans-serif !important;
+}}
+
+/* All sidebar navigation items (Streamlit native nav links) */
+[data-testid="stSidebar"] [data-testid="stSidebarNavLink"],
+[data-testid="stSidebar"] [data-testid="stSidebarNav"] a,
+[data-testid="stSidebar"] [data-testid="stPageLink"] a,
+[data-testid="stSidebar"] a {{
+    background-color: transparent !important;
+    color: #CBD5E1 !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding: 7px 12px !important;
+    border-radius: 6px !important;
+    transition: all 0.15s ease !important;
+    margin-bottom: 2px !important;
+    display: flex !important;
+    align-items: center !important;
+}}
+
+[data-testid="stSidebar"] [data-testid="stSidebarNavLink"] *,
+[data-testid="stSidebar"] [data-testid="stSidebarNav"] a *,
+[data-testid="stSidebar"] [data-testid="stPageLink"] a * {{
+    color: #CBD5E1 !important;
 }}
 
 [data-testid="stSidebar"] span[data-testid="stIconMaterial"],
 [data-testid="stSidebar"] .material-symbols-rounded {{
     font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+    font-size: 18px !important;
+    color: #94A3B8 !important;
+    margin-right: 8px !important;
 }}
 
-[data-testid="stSidebar"] [data-testid="stPageLink"] a {{
-    color: #A1ABB3 !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    padding: 8px 12px !important;
-    border-radius: 6px !important;
-    transition: all 0.15s ease !important;
-    margin-bottom: 2px !important;
-}}
-
-[data-testid="stSidebar"] [data-testid="stPageLink"] a:hover {{
+/* Hover state */
+[data-testid="stSidebar"] [data-testid="stSidebarNavLink"]:hover,
+[data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover,
+[data-testid="stSidebar"] [data-testid="stPageLink"] a:hover,
+[data-testid="stSidebar"] a:hover {{
     background-color: #161C24 !important;
-    color: #F8FAFC !important;
+    color: #FFFFFF !important;
 }}
 
+[data-testid="stSidebar"] [data-testid="stSidebarNavLink"]:hover *,
+[data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover *,
+[data-testid="stSidebar"] [data-testid="stPageLink"] a:hover * {{
+    color: #FFFFFF !important;
+}}
+
+/* Active Navigation Item */
+[data-testid="stSidebar"] [data-testid="stSidebarNavLink"][aria-current="page"],
+[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"],
 [data-testid="stSidebar"] [data-testid="stPageLink"] a[aria-current="page"],
-[data-testid="stSidebar"] [data-testid="stPageLink"] a.active {{
-    background-color: rgba(0, 191, 166, 0.14) !important;
+[data-testid="stSidebar"] a[aria-current="page"],
+[data-testid="stSidebar"] .active {{
+    background-color: rgba(0, 191, 166, 0.12) !important;
+    border-left: 3px solid #00BFA6 !important;
     color: #00BFA6 !important;
     font-weight: 600 !important;
-    border-left: 3px solid #00BFA6 !important;
+}}
+
+[data-testid="stSidebar"] [data-testid="stSidebarNavLink"][aria-current="page"] *,
+[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"] *,
+[data-testid="stSidebar"] [data-testid="stPageLink"] a[aria-current="page"] *,
+[data-testid="stSidebar"] a[aria-current="page"] * {{
+    color: #00BFA6 !important;
+    font-weight: 600 !important;
+}}
+
+[data-testid="stSidebar"] [data-testid="stSidebarNavLink"][aria-current="page"] span[data-testid="stIconMaterial"] {{
+    color: #00BFA6 !important;
 }}
 
 /* ─── Typography & Headings ────────────────────────────────── */
@@ -167,28 +209,30 @@ h1, h2, h3, h4, h5, h6 {{
 }}
 
 h1 {{
-    font-size: 26px !important;
+    font-size: 21px !important;
     font-weight: 700 !important;
-    margin-bottom: 0.25rem !important;
+    margin-bottom: 0.15rem !important;
 }}
 
 h2 {{
-    font-size: 22px !important;
-    font-weight: 700 !important;
-    margin-top: 1.25rem !important;
-    margin-bottom: 0.5rem !important;
+    font-size: 17px !important;
+    font-weight: 650 !important;
+    margin-top: 0.75rem !important;
+    margin-bottom: 0.3rem !important;
 }}
 
 h3 {{
-    font-size: 18px !important;
+    font-size: 14.5px !important;
     font-weight: 600 !important;
-    margin-top: 1.25rem !important;
-    margin-bottom: 0.4rem !important;
+    margin-top: 0.65rem !important;
+    margin-bottom: 0.25rem !important;
 }}
 
 h4 {{
-    font-size: 15px !important;
+    font-size: 13px !important;
     font-weight: 600 !important;
+    margin-top: 0.45rem !important;
+    margin-bottom: 0.2rem !important;
 }}
 
 p, span, label, div {{
@@ -197,59 +241,59 @@ p, span, label, div {{
 
 .stCaption, [data-testid="stCaptionContainer"] {{
     color: #A1ABB3 !important;
-    font-size: 13px !important;
-    margin-bottom: 12px !important;
+    font-size: 12px !important;
+    margin-bottom: 6px !important;
 }}
 
 /* ─── Compact Scientific Cards ─────────────────────────────── */
 .tf-card {{
     background: #11161D;
     border: 1px solid #232D38;
-    border-radius: 10px;
-    padding: 18px 20px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    margin-bottom: 12px;
+    border-radius: 8px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    margin-bottom: 8px;
 }}
 
 .tf-card-elevated {{
     background: #161C24;
     border: 1px solid #232D38;
-    border-radius: 10px;
-    padding: 18px 20px;
+    border-radius: 8px;
+    padding: 12px 14px;
 }}
 
 /* ─── Compact Scientific Metric Card ────────────────────────── */
 .tf-metric-card {{
     background: #11161D;
     border: 1px solid #232D38;
-    border-radius: 8px;
-    padding: 14px 16px;
-    min-height: 86px;
+    border-radius: 6px;
+    padding: 8px 10px;
+    min-height: 64px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }}
 
 .tf-metric-label {{
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     color: #A1ABB3;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }}
 
 .tf-metric-value {{
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
     color: #F8FAFC;
-    line-height: 1.2;
+    line-height: 1.15;
 }}
 
 .tf-metric-context {{
-    font-size: 12px;
+    font-size: 11px;
     color: #A1ABB3;
-    margin-top: 4px;
+    margin-top: 2px;
 }}
 
 /* ─── Buttons ──────────────────────────────────────────────── */
@@ -259,17 +303,17 @@ button[kind="primary"], .stButton > button[kind="primary"],
     color: #080F14 !important;
     border: none !important;
     font-weight: 600 !important;
-    font-size: 14px !important;
-    height: 42px !important;
+    font-size: 13px !important;
+    height: 36px !important;
     border-radius: 6px !important;
-    padding: 0 1.25rem !important;
-    box-shadow: 0 2px 8px rgba(0, 191, 166, 0.25) !important;
+    padding: 0 1rem !important;
+    box-shadow: 0 2px 6px rgba(0, 191, 166, 0.2) !important;
     transition: all 0.15s ease !important;
 }}
 
 button[kind="primary"]:hover, .stButton > button[kind="primary"]:hover {{
     background-color: #00A892 !important;
-    box-shadow: 0 4px 12px rgba(0, 191, 166, 0.35) !important;
+    box-shadow: 0 3px 10px rgba(0, 191, 166, 0.3) !important;
 }}
 
 button[kind="secondary"], .stButton > button[kind="secondary"],
@@ -278,10 +322,10 @@ button[kind="secondary"], .stButton > button[kind="secondary"],
     color: #F8FAFC !important;
     border: 1px solid #232D38 !important;
     font-weight: 500 !important;
-    font-size: 13px !important;
-    height: 40px !important;
+    font-size: 12px !important;
+    height: 34px !important;
     border-radius: 6px !important;
-    padding: 0 1rem !important;
+    padding: 0 0.85rem !important;
     transition: all 0.15s ease !important;
 }}
 
@@ -295,30 +339,30 @@ button[kind="secondary"]:hover, .stButton > button[kind="secondary"]:hover {{
 .tf-badge {{
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    font-size: 11px;
+    gap: 3px;
+    font-size: 10px;
     font-weight: 600;
-    padding: 3px 8px;
+    padding: 2px 6px;
     border-radius: 4px;
     letter-spacing: 0.02em;
 }}
 
 .tf-badge-pass {{
-    background: rgba(0, 191, 166, 0.14);
+    background: rgba(0, 191, 166, 0.12);
     color: #00BFA6;
-    border: 1px solid rgba(0, 191, 166, 0.35);
+    border: 1px solid rgba(0, 191, 166, 0.3);
 }}
 
 .tf-badge-rejected {{
-    background: rgba(239, 68, 68, 0.14);
+    background: rgba(239, 68, 68, 0.12);
     color: #EF4444;
-    border: 1px solid rgba(239, 68, 68, 0.35);
+    border: 1px solid rgba(239, 68, 68, 0.3);
 }}
 
 .tf-badge-demo {{
-    background: rgba(245, 158, 11, 0.14);
+    background: rgba(245, 158, 11, 0.12);
     color: #F59E0B;
-    border: 1px solid rgba(245, 158, 11, 0.35);
+    border: 1px solid rgba(245, 158, 11, 0.3);
 }}
 
 .tf-badge-locked {{
@@ -330,27 +374,27 @@ button[kind="secondary"]:hover, .stButton > button[kind="secondary"]:hover {{
 /* ─── Data Tables (Streamlit Dataframe) ─────────────────────── */
 [data-testid="stDataFrame"], [data-testid="stTable"] {{
     border: 1px solid #232D38 !important;
-    border-radius: 8px !important;
+    border-radius: 6px !important;
     overflow: hidden !important;
     background: #11161D !important;
 }}
 
-/* ─── Horizontal Stepper ───────────────────────────────────── */
+/* ─── Compact Horizontal Stepper ───────────────────────────── */
 .stepper-container {{
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: relative;
-    padding: 12px 0 20px 0;
-    max-width: 860px;
-    margin: 0 auto;
+    padding: 4px 0 10px 0;
+    max-width: 640px;
+    margin: 0 auto 10px auto;
 }}
 
 .stepper-line-bg {{
     position: absolute;
-    top: 26px;
-    left: 24px;
-    right: 24px;
+    top: 15px;
+    left: 18px;
+    right: 18px;
     height: 2px;
     background: #232D38;
     z-index: 1;
@@ -358,8 +402,8 @@ button[kind="secondary"]:hover, .stButton > button[kind="secondary"]:hover {{
 
 .stepper-line-active {{
     position: absolute;
-    top: 26px;
-    left: 24px;
+    top: 15px;
+    left: 18px;
     height: 2px;
     background: #00BFA6;
     z-index: 2;
@@ -375,16 +419,16 @@ button[kind="secondary"]:hover, .stButton > button[kind="secondary"]:hover {{
 }}
 
 .stepper-circle {{
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: #11161D;
-    border: 2px solid #232D38;
+    border: 1.5px solid #232D38;
     color: #A1ABB3;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     transition: all 0.2s ease;
 }}
@@ -399,14 +443,14 @@ button[kind="secondary"]:hover, .stButton > button[kind="secondary"]:hover {{
     background: #080F14;
     border-color: #00BFA6;
     color: #00BFA6;
-    box-shadow: 0 0 0 4px rgba(0, 191, 166, 0.18);
+    box-shadow: 0 0 0 3px rgba(0, 191, 166, 0.16);
 }}
 
 .stepper-label {{
-    font-size: 11px;
+    font-size: 9.5px;
     font-weight: 600;
     color: #A1ABB3;
-    margin-top: 6px;
+    margin-top: 3px;
     text-transform: capitalize;
 }}
 
@@ -415,42 +459,42 @@ button[kind="secondary"]:hover, .stButton > button[kind="secondary"]:hover {{
     font-weight: 700;
 }}
 
-/* ─── Notice Panels ────────────────────────────────────────── */
+/* ─── Notice Panels (Compact) ──────────────────────────────── */
 .tf-demo-panel {{
     background: rgba(245, 158, 11, 0.08);
-    border: 1px solid rgba(245, 158, 11, 0.25);
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    font-size: 13px;
+    border: 1px solid rgba(245, 158, 11, 0.22);
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    font-size: 11.5px;
     color: #F59E0B;
 }}
 
 .tf-demo-panel code {{
     background: rgba(245, 158, 11, 0.15);
     color: #F8FAFC;
-    padding: 2px 4px;
+    padding: 1px 4px;
     border-radius: 3px;
 }}
 
 .tf-whatif-banner {{
     background: rgba(0, 191, 166, 0.08);
-    border: 1px solid rgba(0, 191, 166, 0.25);
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    font-size: 13px;
+    border: 1px solid rgba(0, 191, 166, 0.22);
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    font-size: 11.5px;
     color: #00BFA6;
 }}
 
 .tf-disclaimer {{
-    font-size: 12px;
+    font-size: 11px;
     color: #64748B;
-    padding: 12px 0;
-    line-height: 1.5;
+    padding: 8px 0;
+    line-height: 1.4;
 }}
 
-/* ─── Form Inputs ──────────────────────────────────────────── */
+/* ─── Form Inputs (Compact) ────────────────────────────────── */
 div[data-baseweb="select"] > div,
 .stTextInput > div > div > input,
 .stNumberInput > div > div > input {{
@@ -458,7 +502,8 @@ div[data-baseweb="select"] > div,
     border: 1px solid #232D38 !important;
     border-radius: 6px !important;
     color: #F8FAFC !important;
-    font-size: 13px !important;
+    font-size: 12px !important;
+    min-height: 34px !important;
 }}
 
 div[data-baseweb="select"] > div:hover,
@@ -467,18 +512,19 @@ div[data-baseweb="select"] > div:hover,
     border-color: #00BFA6 !important;
 }}
 
-/* ─── Expanders ────────────────────────────────────────────── */
+/* ─── Expanders (Compact) ──────────────────────────────────── */
 details {{
     background: #11161D !important;
     border: 1px solid #232D38 !important;
-    border-radius: 8px !important;
-    margin-bottom: 8px !important;
+    border-radius: 6px !important;
+    margin-bottom: 6px !important;
 }}
 
 details summary {{
     color: #F8FAFC !important;
-    font-size: 13px !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
+    padding: 6px 10px !important;
 }}
 </style>
 """
