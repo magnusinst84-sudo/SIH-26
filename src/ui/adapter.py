@@ -99,117 +99,75 @@ def _safe_bool(value: Any, default: bool = False) -> bool:
 
 def adapt_ranked_df(
     df: pd.DataFrame,
-    project_config: dict,
-    filter_config: dict,
+    filter_config: Optional[dict] = None,
+    weights: Optional[dict] = None,
 ) -> list[FrontendCandidate]:
-    """
-    Map the 24-column backend ranking DataFrame to a list of FrontendCandidate
-    objects.
+    """Adapt backend DataFrame to list of FrontendCandidate dataclass objects."""
+    if df is None or df.empty:
+        return []
 
-    Parameters
-    ----------
-    df             : The DataFrame returned by run_demo() or loaded from
-                     results/final_ranking.csv  (READ-ONLY; never mutated).
-    project_config : dict with at least {"target": {"structure_id": "6LU7"}}
-    filter_config  : dict with max_molecular_weight, max_logp, etc.
+    cfg = filter_config or {
+        "max_molecular_weight": 500.0,
+        "max_logp":             5.0,
+        "max_hbd":              5,
+        "max_hba":              10,
+        "max_tpsa":             140.0,
+        "max_rotatable_bonds":  10,
+    }
 
-    Returns a list ordered by rank (ascending).
-    """
-    receptor_id = (
-        project_config.get("target", {}).get("structure_id")
-        or "6LU7"
-    )
     candidates: list[FrontendCandidate] = []
-
-    for _, row in df.iterrows():
-        is_demo = _safe_bool(row.get("is_fallback"), True)
-        fs      = row.get("filter_status", "UNKNOWN")
-        reasons = _derive_filter_reasons(row, filter_config) if fs == "REJECTED" else []
-
-        cand = FrontendCandidate(
-            # Identity
-            candidate_id  = str(row.get("compound_id", "")),
-            smiles        = str(row.get("smiles",       "")),
-            source        = str(row.get("activity_label", "demo")),
-            parent_id     = None,
-
-            # ML prediction (BACKEND — read-only)
-            activity_score  = _safe_float(row.get("activity_score")),
-            model_version   = str(row.get("model_version", "demo_v1")),
-            predicted_class = str(row.get("predicted_class", "unknown")),
-
-            # Molecular properties (BACKEND — read-only)
-            properties = MolecularProperties(
-                mw               = _safe_float(row.get("molecular_weight")),
-                logp             = _safe_float(row.get("logp")),
-                hbd              = _safe_int(row.get("hbd")),
-                hba              = _safe_int(row.get("hba")),
-                tpsa             = _safe_float(row.get("tpsa")),
-                rotatable_bonds  = _safe_int(row.get("rotatable_bonds")),
-            ),
-
-            # Filter (BACKEND status; reasons derived in UI layer)
-            property_score = _safe_float(row.get("property_score")),
-            filter = FilterResult(
-                status  = str(fs),
-                reasons = reasons,
-            ),
-
-            # Docking (BACKEND — read-only)
-            docking = DockingResult(
-                score_raw          = _safe_float(row.get("docking_score"))
-                                     if pd.notna(row.get("docking_score")) else None,
-                score_normalized   = _safe_float(row.get("docking_norm"))
-                                     if pd.notna(row.get("docking_norm")) else None,
-                pose_file          = None,           # not in demo backend
-                receptor_id        = receptor_id,
-                interaction_residues = [],           # not in demo backend
-                docking_status     = str(row.get("docking_status", "UNKNOWN")),
-            ),
-
-            # Ranking scores (BACKEND — read-only)
-            novelty_score = _safe_float(row.get("novelty_score"), 0.5),
-            final_score   = _safe_float(row.get("final_score")),   # INVARIANT
-            rank          = _safe_int(row.get("rank")),            # INVARIANT
-            status        = str(row.get("status", "priority computational candidate")),
-
-            # Normalised components (stored for what-if only)
-            activity_norm = _safe_float(row.get("activity_norm")),
-            docking_norm  = _safe_float(row.get("docking_norm")),
-
-            # UI metadata
-            is_demo  = is_demo,
-            warnings = _DEMO_WARNINGS if is_demo else [],
+    for idx, row in df.iterrows():
+        props = MolecularProperties(
+            mw              = _safe_float(row.get("molecular_weight")),
+            logp            = _safe_float(row.get("logp")),
+            hbd             = _safe_int(row.get("hbd")),
+            hba             = _safe_int(row.get("hba")),
+            tpsa            = _safe_float(row.get("tpsa")),
+            rotatable_bonds = _safe_int(row.get("rotatable_bonds")),
         )
-        candidates.append(cand)
 
-    return sorted(candidates, key=lambda c: c.rank)
+        filter_status = str(row.get("filter_status", "PASS")).upper()
+        reasons_raw   = row.get("filter_reasons", "")
+        reasons_list  = (
+            [r.strip() for r in str(reasons_raw).split(";") if r.strip()]
+            if reasons_raw and pd.notna(reasons_raw)
+            else _derive_filter_reasons(row, cfg) if filter_status == "REJECTED" else []
+        )
 
+        filt = FilterResult(
+            status          = filter_status,
+            passed          = (filter_status == "PASS"),
+            property_score  = _safe_float(row.get("property_score", 1.0 if filter_status == "PASS" else 0.0)),
+            reasons         = reasons_list,
+        )
 
-# ---------------------------------------------------------------------------
-# Adapter for validated (non-ranked) compounds
-# ---------------------------------------------------------------------------
+        docking_raw = row.get("docking_score")
+        dock = DockingResult(
+            score_raw       = _safe_float(docking_raw) if pd.notna(docking_raw) else None,
+            score_norm      = _safe_float(row.get("docking_norm", 0.0)),
+            source          = str(row.get("docking_source", "FALLBACK_DEMO")),
+            is_demo         = True,
+        )
 
-def adapt_validated_df(df: pd.DataFrame) -> list[dict]:
-    """
-    Return a simplified list of dicts from the validated_molecules DataFrame.
-    Used for display on Dataset Manager and Candidate Design pages.
-    """
-    result = []
-    for _, row in df.iterrows():
-        result.append({
-            "compound_id":      str(row.get("compound_id", "")),
-            "smiles":           str(row.get("smiles",       "")),
-            "canonical_smiles": str(row.get("canonical_smiles", row.get("smiles", ""))),
-            "mw":               _safe_float(row.get("molecular_weight")),
-            "logp":             _safe_float(row.get("logp")),
-            "hbd":              _safe_int(row.get("hbd")),
-            "hba":              _safe_int(row.get("hba")),
-            "tpsa":             _safe_float(row.get("tpsa")),
-            "rotatable_bonds":  _safe_int(row.get("rotatable_bonds")),
-            "activity_label":   str(row.get("activity_label", "demo")),
-        })
-    return result
+        candidate = FrontendCandidate(
+            rank            = _safe_int(row.get("rank", idx + 1)),
+            candidate_id    = str(row.get("compound_id", f"CMP-{idx+1:03d}")),
+            smiles          = str(row.get("smiles", "")),
+            activity_score  = _safe_float(row.get("activity_score", 0.0)),
+            activity_norm   = _safe_float(row.get("activity_norm", row.get("activity_score", 0.0))),
+            docking_norm    = _safe_float(row.get("docking_norm", 0.0)),
+            property_score  = _safe_float(row.get("property_score", 1.0)),
+            novelty_score   = _safe_float(row.get("novelty_score", 0.5)),
+            final_score     = _safe_float(row.get("final_score", 0.0)),
+            properties      = props,
+            filter          = filt,
+            docking         = dock,
+            predicted_class = str(row.get("predicted_class", "active")),
+            warnings        = list(_DEMO_WARNINGS),
+        )
+        candidates.append(candidate)
+
+    return candidates
 
 
 # ---------------------------------------------------------------------------
@@ -217,24 +175,8 @@ def adapt_validated_df(df: pd.DataFrame) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 def reapply_filters(validated_df: pd.DataFrame, ui_config: dict) -> pd.DataFrame:
-    """
-    UI-layer filter re-computation for interactive threshold sliders.
-
-    Mirrors the logic of src.molecular_ai.filters.apply_filters() but uses
-    ui_config from the slider state instead of the static filters.yaml config.
-    Does NOT call apply_filters() — avoids importing M6 code from UI.
-
-    Parameters
-    ----------
-    validated_df : pd.DataFrame with descriptor columns already present.
-    ui_config    : dict with max_molecular_weight, max_logp, max_hbd,
-                   max_hba, max_tpsa, max_rotatable_bonds.
-
-    Returns a new DataFrame (copy) with updated filter_status, property_score,
-    and filter_reasons columns.  Original DataFrame is NOT mutated.
-    """
+    """UI-layer filter re-computation for interactive threshold sliders."""
     out = validated_df.copy()
-
     has_rb = "rotatable_bonds" in out.columns
 
     mw_ok  = out["molecular_weight"] <= ui_config.get("max_molecular_weight", 500)
@@ -267,21 +209,7 @@ def rerank_candidates(
     candidates: list[FrontendCandidate],
     whatif_weights: dict,
 ) -> list[FrontendCandidate]:
-    """
-    Frontend-only what-if ranking using user-supplied weights.
-
-    Creates DEEP COPIES of each FrontendCandidate so that the originals
-    are NEVER mutated.  Sets .whatif_score and .whatif_rank on the copies.
-    The copies' .final_score and .rank remain the original backend values.
-
-    Parameters
-    ----------
-    candidates    : The canonical list from tf_candidates (read-only).
-    whatif_weights: dict with activity_weight, docking_weight,
-                    property_weight, novelty_weight.
-
-    Returns a new list of deep-copied candidates sorted by whatif_score.
-    """
+    """Frontend-only what-if ranking using user-supplied weights."""
     aw = float(whatif_weights.get("activity_weight",  0.40))
     dw = float(whatif_weights.get("docking_weight",   0.30))
     pw = float(whatif_weights.get("property_weight",  0.20))
@@ -302,3 +230,40 @@ def rerank_candidates(
     for i, wc in enumerate(result):
         wc.whatif_rank = i + 1
     return result
+
+
+def compute_whatif_ranking(
+    candidates: list[FrontendCandidate],
+    whatif_weights: dict,
+) -> list[FrontendCandidate]:
+    """Alias for rerank_candidates."""
+    return rerank_candidates(candidates, whatif_weights)
+
+
+# ---------------------------------------------------------------------------
+# Table & CSV formatting helpers
+# ---------------------------------------------------------------------------
+
+def build_ranking_table_df(candidates: list[FrontendCandidate]) -> pd.DataFrame:
+    """Build a presentation DataFrame for the Final Ranking table."""
+    records = []
+    for c in candidates:
+        records.append({
+            "Rank":            c.rank,
+            "Compound ID":     c.candidate_id,
+            "Activity Score":  round(c.activity_score, 4),
+            "Docking (kcal/mol)": round(c.docking.score_raw, 2) if c.docking.score_raw is not None else "N/A",
+            "Property Score":  round(c.property_score, 2),
+            "Novelty Score":   round(c.novelty_score, 2),
+            "Composite Score": round(c.final_score, 4),
+            "MW (Da)":         round(c.properties.mw, 1),
+            "LogP":            round(c.properties.logp, 2),
+            "Status":          c.filter.status,
+        })
+    return pd.DataFrame(records)
+
+
+def build_ranking_csv(candidates: list[FrontendCandidate]) -> str:
+    """Export the candidate list to a CSV string."""
+    df = build_ranking_table_df(candidates)
+    return df.to_csv(index=False)
