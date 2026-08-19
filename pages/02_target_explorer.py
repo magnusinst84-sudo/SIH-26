@@ -256,13 +256,13 @@ with col_right:
     function applyCartoonRibbon(v) {{
       v.setStyle({{hetflag: false}}, {{cartoon: {{color: '#00BFA6', thickness: 0.45, style: 'oval', opacity: 0.95}}}});
       // Highlight Catalytic Dyad in rich amber sticks
-      v.addStyle({{resi: [41, 145]}}, {{stick: {{colorscheme: 'orangeCarbon', radius: 0.35}}, sphere: {{scale: 0.25, colorscheme: 'orangeCarbon'}}}});
-      // Highlight bound inhibitor/ligand in yellow-green sticks
-      v.addStyle({{hetflag: true}}, {{stick: {{colorscheme: 'greenCarbon', radius: 0.28}}}});
-      v.addLabels([
-        {{text: "His41", position: {{resi: 41}}, fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 10}},
-        {{text: "Cys145", position: {{resi: 145}}, fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 10}}
-      ]);
+      v.addStyle({{resi: [41, 145]}}, {{stick: {{color: '#F59E0B', radius: 0.35}}, sphere: {{scale: 0.25, color: '#F59E0B'}}}});
+      // Highlight bound inhibitor/ligand in green sticks
+      v.addStyle({{hetflag: true}}, {{stick: {{color: '#10B981', radius: 0.28}}}});
+      try {{
+        v.addLabel("His41", {{fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 10}}, {{resi: 41}});
+        v.addLabel("Cys145", {{fontColor: "#F8FAFC", backgroundColor: "rgba(17,22,29,0.85)", fontSize: 10}}, {{resi: 145}});
+      }} catch (e) {{}}
     }}
 
     document.addEventListener("DOMContentLoaded", function() {{
