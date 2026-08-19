@@ -1,52 +1,69 @@
+"""
+app.py — TargetForge entry point and navigation router.
+
+Responsibilities (ONLY):
+  1. Add repo root to sys.path.
+  2. Call st.set_page_config.
+  3. Inject global CSS.
+  4. Initialise session state.
+  5. Define st.Page objects for all 8 workflow pages.
+  6. Call st.navigation to dispatch to the active page.
+
+All content is rendered in the individual page modules under pages/.
+This file does NOT render any content itself.
+
+Team ownership: M4 (Frontend/UI Lead) owns app.py and pages/*.
+                Do not modify src/ml/, src/pipeline/, src/ranking/,
+                src/docking/, src/data/, src/chemistry/, src/molecular_ai/,
+                configs/, data/, tests/, or scripts/.
+"""
 from pathlib import Path
 import sys
 
-import pandas as pd
-import streamlit as st
-
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
-from src.pipeline.run_demo import run_demo
 
-st.set_page_config(page_title="TargetForge", page_icon="🧬", layout="wide")
-st.title("TargetForge")
-st.caption("AI-assisted target-specific virtual screening")
-st.info("Demo: COVID-19 → SARS-CoV-2 Mpro/3CLpro. Results are computational hypotheses and require laboratory validation.")
+import streamlit as st
 
+from src.ui.theme import inject_global_css
+from src.ui.state import init_session_state
+
+# ─── Page config (must be the very first Streamlit call) ─────────────────────
+st.set_page_config(
+    page_title          = "TargetForge",
+    page_icon           = "src/ui/assets/favicon.png",
+    layout              = "wide",
+    initial_sidebar_state = "expanded",
+)
+
+# ─── Global CSS + session state (idempotent) ──────────────────────────────────
+inject_global_css()
+init_session_state(ROOT)
+
+# ─── Page definitions ─────────────────────────────────────────────────────────
+pages = [
+    st.Page("pages/01_home.py",             title="Home",             icon=":material/home:", default=True),
+    st.Page("pages/02_target_explorer.py",  title="Target Explorer",  icon=":material/track_changes:"),
+    st.Page("pages/03_dataset_manager.py",  title="Dataset Manager",  icon=":material/database:"),
+    st.Page("pages/04_ai_screening.py",     title="AI Screening",     icon=":material/hub:"),
+    st.Page("pages/05_candidate_design.py", title="Candidate Design", icon=":material/science:"),
+    st.Page("pages/06_docking_analysis.py", title="Docking Analysis", icon=":material/join_inner:"),
+    st.Page("pages/07_final_ranking.py",    title="Final Ranking",    icon=":material/leaderboard:"),
+    st.Page("pages/08_reports.py",          title="Reports",          icon=":material/description:"),
+]
+
+# ─── Sidebar branding ────────────────────────────────────────────────────────
 with st.sidebar:
-    st.header("Workflow")
-    st.write("1. Select target")
-    st.write("2. Validate compounds")
-    st.write("3. Predict activity")
-    st.write("4. Filter candidates")
-    st.write("5. Dock top candidates")
-    st.write("6. Rank results")
-    run = st.button("Run demo screening", type="primary")
+    st.markdown(
+        '<div style="padding: 0 4px 16px 4px; border-bottom: 1px solid #232D38; margin-bottom: 12px;">'
+        '<span style="font-size: 18px; font-weight: 700; color: #F8FAFC; letter-spacing: -0.02em;">'
+        'Target<span style="color: #00BFA6;">Forge</span>'
+        '</span>'
+        '<div style="font-size: 11px; color: #A1ABB3; margin-top: 2px;">Scientific Decision Support</div>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
-if run:
-    with st.spinner("Running TargetForge demonstration pipeline..."):
-        results = run_demo(ROOT)
-    st.success("Screening complete")
-else:
-    path = ROOT / "results" / "final_ranking.csv"
-    results = pd.read_csv(path) if path.exists() else None
-
-if results is not None and not results.empty:
-    first = results.iloc[0]
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Candidates ranked", len(results))
-    c2.metric("Top candidate", first["compound_id"])
-    c3.metric("Activity score", f"{first['activity_score']:.3f}")
-    c4.metric("Final score", f"{first['final_score']:.3f}")
-    st.subheader("Final candidate ranking")
-    columns = ["rank", "compound_id", "activity_score", "docking_score", "property_score", "final_score", "status"]
-    st.dataframe(results[[c for c in columns if c in results.columns]], use_container_width=True, hide_index=True)
-    st.subheader("Score comparison")
-    chart_cols = [c for c in ["activity_score", "property_score", "final_score"] if c in results.columns]
-    st.bar_chart(results.set_index("compound_id")[chart_cols])
-    st.download_button("Download ranking CSV", results.to_csv(index=False), "targetforge_ranking.csv", "text/csv")
-else:
-    st.warning("Run the demonstration pipeline or execute scripts/prepare_demo.py first.")
-
-st.divider()
-st.caption("TargetForge is a hackathon prototype. It does not establish safety, efficacy, or clinical approval.")
+# ─── Navigation dispatch ──────────────────────────────────────────────────────
+pg = st.navigation(pages)
+pg.run()
