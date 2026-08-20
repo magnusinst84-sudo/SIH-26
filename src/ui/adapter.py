@@ -99,6 +99,7 @@ def _safe_bool(value: Any, default: bool = False) -> bool:
 
 def adapt_ranked_df(
     df: pd.DataFrame,
+    project_config: Optional[dict] = None,
     filter_config: Optional[dict] = None,
     weights: Optional[dict] = None,
 ) -> list[FrontendCandidate]:
@@ -106,14 +107,22 @@ def adapt_ranked_df(
     if df is None or df.empty:
         return []
 
-    cfg = filter_config or {
-        "max_molecular_weight": 500.0,
-        "max_logp":             5.0,
-        "max_hbd":              5,
-        "max_hba":              10,
-        "max_tpsa":             140.0,
-        "max_rotatable_bonds":  10,
-    }
+    # Handle flexible argument orders if caller passes (df, filter_config) vs (df, project_config, filter_config)
+    if project_config and ("max_molecular_weight" in project_config or "max_logp" in project_config):
+        cfg = project_config
+        proj = filter_config or {}
+    else:
+        proj = project_config or {}
+        cfg = filter_config or {
+            "max_molecular_weight": 500.0,
+            "max_logp":             5.0,
+            "max_hbd":              5,
+            "max_hba":              10,
+            "max_tpsa":             140.0,
+            "max_rotatable_bonds":  10,
+        }
+
+    receptor_id = str(proj.get("target", {}).get("structure_id", "6LU7")) if proj else "6LU7"
 
     candidates: list[FrontendCandidate] = []
     for idx, row in df.iterrows():
@@ -141,9 +150,10 @@ def adapt_ranked_df(
 
         docking_raw = row.get("docking_score")
         dock = DockingResult(
-            score_raw        = _safe_float(docking_raw) if pd.notna(docking_raw) else None,
-            score_normalized = _safe_float(row.get("docking_norm", 0.0)),
-            docking_status   = str(row.get("docking_source", "FALLBACK_DEMO")),
+            score_raw          = _safe_float(docking_raw) if pd.notna(docking_raw) else None,
+            score_normalized   = _safe_float(row.get("docking_norm", 0.0)) if pd.notna(row.get("docking_norm")) else None,
+            receptor_id        = receptor_id,
+            docking_status     = str(row.get("docking_status", row.get("docking_source", "FALLBACK_DEMO"))),
         )
 
         candidate = FrontendCandidate(
